@@ -1,0 +1,25 @@
+# 运行时/密钥 —— 绝不提交
+data/
+logs/
+*.log
+.env
+# 构建产物
+build/
+build-linux/
+build-venv/
+dist/
+dist-linux/
+packaging/.deb_stage/
+# Python/Node 依赖与缓存
+.venv/
+__pycache__/
+*.pyc
+.Python
+node_modules/
+# 桌面客户端的编译产物（若重新启用 Tauri 才需要这些）
+gateway-client/target/
+gateway-client/node_modules/
+# 临时
+*.tmp
+.DS_Store
+Thumbs.db

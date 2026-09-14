@@ -1,0 +1,9 @@
+#!/bin/sh
+# AI-LLM prerm：卸载前尽量停掉 systemd 用户服务；不删用户数据
+set -e
+
+if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+    systemctl --user stop ai-llm.service 2>/dev/null || true
+fi
+
+exit 0

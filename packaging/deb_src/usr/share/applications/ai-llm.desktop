@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=AI-LLM 智能网关
+Name[en]=AI-LLM Gateway
+Comment=启动 AI 智能网关（免费/会员模型聚合）
+Comment[en]=Start AI-LLM gateway (free model aggregator)
+Exec=/usr/bin/ai-llm --open
+Terminal=false
+Categories=Network;
+Keywords=AI;gateway;llm;
+StartupNotify=true

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "port": 18123,
+  "systemPromptTemplate": "",
+  "systemPromptMode": "append",
+  "tokenCompression": {
+    "enabled": false,
+    "maxContextTokens": 8000,
+    "strategy": "truncate"
+  },
+  "autoProbe": {
+    "enabled": true,
+    "intervalMinutes": 15,
+    "timeoutSeconds": 20,
+    "probeModelsPerRound": 2
+  },
+  "upstream": {
+    "connectTimeout": 5,
+    "requestTimeout": 180,
+    "streamFirstByteTimeout": 60,
+    "streamIdleTimeout": 180,
+    "sseKeepAliveSeconds": 15,
+    "maxConcurrentPerSupplier": 16,
+    "slotWaitSeconds": 10,
+    "includeUsage": true,
+    "maxRequestBodyMB": 32,
+    "maxResponseMB": 64,
+    "defaultMaxTokens": 16000,
+    "toolPreferNonFree": false
+  },
+  "adminToken": "",
+  "smartRouting": {
+    "enabled": true,
+    "classifier": {
+      "model": "",
+      "pool": "",
+      "timeoutSeconds": 4,
+      "maxChars": 500,
+      "budgetMs": 0,
+      "cacheTtlSeconds": 300
+    },
+    "rules": {
+      "simpleMaxChars": 15,
+      "longCtxTokens": 8000
+    },
+    "routes": {
+      "SIMPLE": {
+        "prefer": "speed",
+        "benchMax": 82
+      },
+      "REASONING": {
+        "benchMin": 85
+      },
+      "CODE": {
+        "benchMin": 85
+      },
+      "VISION": {
+        "vision": true
+      },
+      "LONG_CTX": {
+        "ctxFromMessages": true
+      }
+    }
+  },
+  "customRoutes": {},
+  "pools": {
+    "free": [],
+    "vip": []
+  },
+  "defaultPool": "free",
+  "suppliers": [],
+  "bindHost": "127.0.0.1"
+}

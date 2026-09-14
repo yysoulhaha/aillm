@@ -1,0 +1,26 @@
+#!/bin/sh
+# AI-LLM 智能网关 postinst：首次安装创建虚拟环境并安装 Python 依赖
+# （依赖装于 /opt/AI-LLM/.venv，不污染系统 Python）。
+# 用户数据（$XDG_DATA_HOME/ai-llm 或 ~/.local/share/ai-llm）由程序首次启动自动创建。
+set -e
+
+APP=/opt/AI-LLM
+
+if [ ! -x "$APP/.venv/bin/python" ]; then
+    python3 -m venv "$APP/.venv"
+fi
+
+"$APP/.venv/bin/python" -m pip install --quiet --disable-pip-version-check --upgrade pip
+"$APP/.venv/bin/python" -m pip install --quiet --disable-pip-version-check --no-input -r "$APP/requirements.txt"
+
+# 目录权限收口（源码只读，防止误改）
+chmod -R a+rX "$APP"
+chmod 755 /usr/bin/ai-llm
+
+# 已启用 systemd 用户服务则重启
+if [ -d /run/systemd/system ] && command -v systemctl >/dev/null 2>&1; then
+    systemctl --user daemon-reload 2>/dev/null || true
+    systemctl --user restart ai-llm.service 2>/dev/null || true
+fi
+
+exit 0

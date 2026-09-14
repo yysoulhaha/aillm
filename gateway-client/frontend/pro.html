@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>AI-LLM · 专业版</title>
+<style>
+:root{--bg:#0d1017;--card:#161b24;--txt:#e6e9f0;--sub:#8b93a3;--acc:#ff8c00;--ok:#3fbf7f;--warn:#e0a83d;--err:#e05555;--line:#252b38}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Microsoft YaHei",system-ui,sans-serif}
+body{background:var(--bg);color:var(--txt)}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:14px}
+.logo{font-weight:bold;font-size:16px}.logo b{color:var(--acc)}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:6px}
+.tab-btn{border:none;background:none;color:var(--sub);padding:7px 13px;border-radius:8px;cursor:pointer;font-size:13px}
+.tab-btn.active{background:var(--acc);color:#fff;font-weight:bold}
+.mode-link{margin-left:auto;font-size:12px;color:var(--sub);text-decoration:none;border:1px solid var(--line);padding:5px 12px;border-radius:14px}
+.mode-link:hover{color:var(--acc);border-color:var(--acc)}
+main{padding:16px 18px}
+.page{display:none}.page.active{display:block}
+h3{font-size:15px;margin-bottom:10px}
+.sec-title{font-size:14px;font-weight:bold;margin:18px 0 8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+button{background:var(--acc);border:none;color:#fff;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px}
+button:hover{filter:brightness(1.12)}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+button.small{padding:4px 10px;font-size:12px}
+input,select,textarea{background:#0d1017;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:7px 10px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:var(--sub);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #1c222e;vertical-align:top}
+.mono{font-family:Consolas,monospace;font-size:12px}
+.hint{color:var(--sub);font-size:12px;font-weight:normal}
+.flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;background:#20262f}
+.t-free{color:var(--ok)}.t-paid{color:var(--acc)}.t-off{color:var(--sub)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%}
+.s-ok{background:var(--ok)}.s-open{background:var(--err)}.s-err{background:var(--warn)}.s-off{background:#555}
+.row{display:flex;justify-content:space-between;font-size:12px;margin:4px 0}
+.bar{height:6px;background:#20262f;border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok)}
+pre#logbox{background:#0a0d12;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:11.5px;max-height:420px;overflow:auto;white-space:pre-wrap}
+.fstep{background:#11151d;border-left:3px solid var(--acc);padding:8px 12px;border-radius:6px;font-size:13px;line-height:1.6}
+.farr{text-align:center;color:var(--sub);margin:2px 0}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;align-items:flex-start;justify-content:center;overflow:auto}
+.overlay.show{display:flex}
+.modal{background:var(--card);border:1px solid var(--line);margin:40px auto;border-radius:12px;padding:20px;width:min(720px,94vw)}
+.testbox{background:#0a0d12;border:1px solid var(--line);padding:10px;margin-top:8px;font-size:12px;max-height:180px;overflow:auto;display:none;white-space:pre-wrap}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#2a3040;color:#fff;padding:8px 18px;border-radius:8px;display:none;z-index:99;font-size:13px}
+.help h3{margin-top:16px}.help p{font-size:13px;line-height:1.75;color:#c6ccd8}
+.msg .who{font-size:11px;color:var(--sub);margin-bottom:3px}
+.bubble{padding:10px 14px;border-radius:14px;line-height:1.65;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.me{align-self:flex-end;text-align:right}.me .bubble{background:var(--acc);color:#fff}
+.ai .bubble{background:var(--card);border:1px solid var(--line)}
+.reason{background:#171226;border:1px dashed #4b3a80;color:#b39ddb;border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:6px;white-space:pre-wrap}
+.conv{padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
+.conv.active{background:#20262f;color:var(--txt)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🚀 AI<b>模型网关C</b> <span class="hint">专业版</span></div>
+  <nav>
+    <button class="tab-btn active" data-tab="chat">💬 聊天</button>
+    <button class="tab-btn" data-tab="sup">🏭 供应商</button>
+    <button class="tab-btn" data-tab="mon">📊 监控日志</button>
+    <button class="tab-btn" data-tab="set">⚙️ 设置</button>
+    <button class="tab-btn" data-tab="route">🧭 路由</button>
+    <button class="tab-btn" data-tab="help">📖 帮助</button>
+  </nav>
+  <a class="mode-link" href="/simple" onclick="localStorage.setItem('agc_ui_mode','simple')">🏠 切换到普通版</a>
+</header>
+<main>
+
+<!-- ============ 聊天 ============ -->
+<section class="page active" id="tab-chat">
+  <div style="display:flex;gap:0;height:calc(100vh - 130px)">
+    <div style="width:190px;border-right:1px solid var(--line);padding:10px;overflow:auto">
+      <h3>会话 <button class="small ghost" onclick="newConv()">＋新建</button></h3>
+      <div id="convList"></div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+      <div class="flex" style="padding:8px 12px;border-bottom:1px solid var(--line)">
+        <input id="model" value="auto" title="auto / auto:free / vision:free / 具体模型id" style="width:220px">
+        <select id="pool"><option value="">全部额度（推荐）</option><option value="free">免费池</option><option value="vip">付费池</option></select>
+        <span class="hint">temp</span><input id="temp" type="number" step="0.1" min="0" max="2" value="0.7" style="width:70px">
+        <span class="hint">max_tokens</span><input id="maxtok" type="number" min="1" style="width:88px" placeholder="默认">
+        <span class="hint" id="supTip"></span>
+      </div>
+      <div id="msgs" style="flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px"></div>
+      <div style="display:flex;gap:10px;padding:10px 12px;border-top:1px solid var(--line)">
+        <textarea id="txt" placeholder="输入消息，Enter 发送 / Shift+Enter 换行" style="flex:1;resize:none;height:60px"></textarea>
+        <button id="sendBtn" onclick="send()">发送</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 供应商 ============ -->
+<section class="page" id="tab-sup">
+  <div class="flex" style="margin-bottom:12px">
+    <button onclick="openSupModal()">＋ 新增供应商</button>
+    <button class="ghost small" onclick="loadCfg()">↻ 刷新</button>
+    <span class="hint">所有修改立即写入 config.json 并生效</span>
+  </div>
+  <div class="card" style="padding:0"><table>
+    <thead><tr><th>ID</th><th>名称</th><th>BaseURL</th><th>协议</th><th>配额</th><th>代理</th><th>Keys</th><th>模型</th><th>Fallback</th><th>熔断</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody id="supBody"></tbody></table></div>
+</section>
+
+<!-- ============ 监控 ============ -->
+<section class="page" id="tab-mon">
+  <div class="sec-title flex">🧠 auto 智能分流（近 24 小时）
+    <button class="small ghost" onclick="loadAuto()">刷新</button><span class="hint" id="autoTotal"></span></div>
+  <div class="card" style="padding:0"><table>
+    <thead><tr><th>类别</th><th>请求数</th><th>占比</th><th>判定来源</th><th>Top 命中</th></tr></thead>
+    <tbody id="autoBody"></tbody></table></div>
+
+  <div class="sec-title flex">🏆 优选建议（综合分 = 稳定性 × 速度 × 能力）
+    <button class="small ghost" onclick="runProbe()">立即探测</button>
+    <button class="small ghost" onclick="loadProbe()">刷新</button><span class="hint" id="probeState"></span></div>
+  <div class="card" style="padding:0"><table>
+    <thead><tr><th>#</th><th>供应商</th><th>池</th><th>成功率</th><th>平均延迟</th><th>稳定性</th><th>速度</th><th>能力</th><th>综合分</th><th></th></tr></thead>
+    <tbody id="probeBody"></tbody></table></div>
+
+  <div class="sec-title flex">🩺 模型级探测健康 <span class="hint">问题模型排最前；轮询巡检覆盖所有启用模型</span></div>
+  <div class="card" style="padding:0"><table>
+    <thead><tr><th>供应商</th><th>模型</th><th>探测次数</th><th>成功率</th><th>平均延迟</th><th>状态</th></tr></thead>
+    <tbody id="pmBody"></tbody></table></div>
+
+  <div class="sec-title flex">📈 请求量曲线（近 30 分钟）<span class="hint">共 <b id="reqTotal">0</b> 条 · <span id="reqPer">-</span></span></div>
+  <div class="card"><div id="reqChart" style="min-height:120px"></div></div>
+
+  <div class="sec-title">供应商健康度（每 8 秒刷新）</div>
+  <div class="grid" id="healthGrid"></div>
+
+  <div class="sec-title flex">💰 Token 消耗（近 24 小时）
+    <button class="small ghost" onclick="loadUsage()">刷新</button>
+    <span class="hint">每家消耗最大的模型是稳定性参考</span></div>
+  <div class="card" style="padding:0"><table>
+    <thead><tr><th>供应商</th><th>请求次数</th><th>Prompt</th><th>Completion</th><th>合计 Tokens</th><th>🔥 最大消耗模型</th></tr></thead>
+    <tbody id="usageBody"></tbody></table></div>
+
+  <div class="sec-title flex">📜 全链路日志
+    <button class="small ghost" onclick="loadLogs()">刷新日志</button>
+    <label class="hint"><input type="checkbox" id="logAuto" onchange="logAutoTick()"> 自动刷新</label></div>
+  <pre id="logbox">（暂无日志）</pre>
+</section>
+
+<!-- ============ 设置 ============ -->
+<section class="page" id="tab-set">
+  <div class="card"><h3>全局系统提示词</h3>
+    <textarea id="sysPrompt" rows="3" style="width:100%"></textarea>
+    <div class="flex" style="margin-top:8px">
+      注入模式 <select id="sysMode"><option value="append">append 追加</option><option value="override">override 覆盖</option></select>
+      默认池 <select id="defPool"><option value="">全部（不过滤）</option><option value="free">free</option><option value="vip">付费</option></select>
+    </div></div>
+  <div class="card"><h3>Token 压缩</h3>
+    <div class="flex"><label class="hint"><input type="checkbox" id="tcOn"> 启用</label>
+      阈值 <input id="tcMax" type="number" style="width:110px"> tokens
+      <select id="tcStrategy"><option value="truncate">truncate 截断</option><option value="summarize">summarize 摘要</option></select></div></div>
+  <div class="card"><h3>🏆 自动优选探测</h3>
+    <div class="flex"><label class="hint"><input type="checkbox" id="apOn"> 启用定时探测</label>
+      间隔 <input id="apMin" type="number" min="5" style="width:90px"> 分钟
+      超时 <input id="apTo" type="number" min="5" style="width:80px"> 秒
+      每轮巡检模型数 <input id="apPer" type="number" min="1" max="10" style="width:70px"></div>
+    <div class="hint">能力分取公开测评知识表，未命中时按 DataLearner 参数量推断。</div></div>
+  <div class="card"><h3>🧠 智能路由（auto 专属）</h3>
+    <div class="flex"><label class="hint"><input type="checkbox" id="srOn"> 启用智能路由</label></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:6px">
+      <div><label class="hint">分类器模型</label><input id="srModel" style="width:100%" placeholder="留空=跳过LLM分类器"></div>
+      <div><label class="hint">分类器池</label><select id="srPool" style="width:100%"><option value="">全部</option><option value="free">free</option><option value="vip">付费</option></select></div>
+      <div><label class="hint">分类器超时(秒)</label><input id="srTo" type="number" min="1" max="10" style="width:80px"></div>
+    </div>
+    <div class="hint" style="margin-top:6px">SIMPLE→速度优先 | REASONING/CODE→高能力 | VISION→视觉 | LONG_CTX→大上下文；找不到符合的自动松弛降级。</div></div>
+  <div class="flex" style="margin-top:6px">
+    <button onclick="saveSettings()">保存全部设置</button>
+    <button class="ghost" onclick="resetSettings()">↺ 恢复默认设置</button>
+    <span class="hint">恢复默认保留模型数据/自定义路由，仅重置偏好项</span></div>
+</section>
+
+<!-- ============ 路由 ============ -->
+<section class="page" id="tab-route">
+  <div class="sec-title">🧩 自定义路由（把挑选的模型组合成一个名字，聊天框直接填这个名）</div>
+  <div class="card" style="padding:0"><table>
+    <thead><tr><th>路由名</th><th>模型数</th><th>包含模型</th><th>操作</th></tr></thead>
+    <tbody id="crBody"></tbody></table></div>
+  <div class="card">
+    <div class="flex">
+      <span class="hint">路由名</span><input id="crName" placeholder="如 auto2" style="width:140px">
+      <button onclick="saveRoute()">保存路由</button>
+      <button class="ghost small" onclick="resetRouteForm()">清空表单</button>
+    </div>
+    <label class="hint" style="display:block;margin-top:8px">模型 ID 列表（每行一个，必须是模型广场里存在的完整 ID）</label>
+    <textarea id="crModels" rows="4" class="mono" style="width:100%"></textarea>
+  </div>
+
+  <div class="sec-title">请求路由决策链（每条对话请求都按此顺序处理）</div>
+  <div class="card">
+    <div class="fstep">① <b>入站协议识别</b> —— OpenAI/Anthropic/Gemini 自动转内部格式</div><div class="farr">↓</div>
+    <div class="fstep">② <b>系统提示词注入</b></div><div class="farr">↓</div>
+    <div class="fstep">③ <b>Token 压缩</b>（超阈值才触发）</div><div class="farr">↓</div>
+    <div class="fstep">③⑤ <b>🧠 智能路由分类</b>（auto 专属）—— 规则速判 → LLM 分类 → hint → 松弛降级</div><div class="farr">↓</div>
+    <div class="fstep">④ <b>池过滤</b> —— 未指定 pool 时不过滤；显式 ?pool= 才限定范围</div><div class="farr">↓</div>
+    <div class="fstep">⑤ <b>别名与约束解析</b> —— auto/fast/vision、ctx&gt;=N、free/paid</div><div class="farr">↓</div>
+    <div class="fstep">⑥ <b>配额感知排序</b> —— unlimited 排前 limited 排后；⭐preferred 同级置顶；同级加权随机</div><div class="farr">↓</div>
+    <div class="fstep">⑦ <b>熔断检查</b> —— 连续失败达阈值且未过重置时间的跳过</div><div class="farr">↓</div>
+    <div class="fstep">⑧ <b>Key 轮询</b> —— supportedModels 过滤 + round-robin 分摊</div><div class="farr">↓</div>
+    <div class="fstep">⑨ <b>出站适配</b> —— 协议转换 / 专属代理</div><div class="farr">↓</div>
+    <div class="fstep" style="display:flex;gap:20px"><span style="color:var(--ok)">✔ 成功 → 记录统计并返回</span><span style="color:var(--err)">✘ 失败 → 仅供应商故障(401/402/403/429/5xx)计熔断并换下一家；400/404 等模型级问题不计熔断直接换</span></div>
+  </div>
+  <div class="sec-title flex">当前生效路由 · FREE 池 <button class="small ghost" onclick="renderRoutes()">↻ 刷新</button></div>
+  <div class="card" style="padding:0"><table>
+    <thead><tr><th>优先级</th><th>供应商</th><th>协议</th><th>配额</th><th>熔断 阈值/重置</th><th>Fallback 链</th><th>Key 限制</th><th>启用模型</th></tr></thead>
+    <tbody id="routeFree"></tbody></table></div>
+  <div class="sec-title">当前生效路由 · 付费池</div>
+  <div class="card" style="padding:0"><table>
+    <thead><tr><th>优先级</th><th>供应商</th><th>协议</th><th>配额</th><th>熔断 阈值/重置</th><th>Fallback 链</th><th>Key 限制</th><th>启用模型</th></tr></thead>
+    <tbody id="routePaid"></tbody></table></div>
+</section>
+
+<!-- ============ 帮助 ============ -->
+<section class="page" id="tab-help">
+  <div class="help card">
+    <h3>🚀 快速开始</h3>
+    <p>桌面客户端双击 <span class="mono">ai-gateway-c-client.exe</span> 自动启动网关(:18123)；或命令行 <span class="mono">py -3 server.py</span> 后访问 <span class="mono">http://127.0.0.1:18123/pro</span>。普通版入口 <span class="mono">/simple</span>。</p>
+    <h3>🔌 客户端接入</h3>
+    <p>API Base : <span class="mono">http://127.0.0.1:18123/v1</span>　API Key : 任意值<br>
+    模型名 : auto（全库自动挑）/ auto:free / 具体模型ID；可加 pool 参数限定免费或付费池</p>
+    <h3>➕ 添加上游流程</h3>
+    <p>① 新增供应商 → 填 ID/BaseURL(/v1 结尾)/协议/配额　② 填 Keys（免Key填 __KEYLESS__）<br>
+    ③ 🔍测试连通拉模型 → ⬇填入 → 保存　④ 「⇅同步」拉上游全量：原有保持，新增默认停用</p>
+    <h3>🧠 智能路由</h3>
+    <pre class="mono">规则速判：≤15字→SIMPLE(快) | 含```/代码词→CODE(强) | 图片→VISION | ≥8000tok→LONG_CTX
+无法判定→LLM 分类器；hint 未命中自动松弛降级（bench界→vision→minCtx→无）</pre>
+    <h3>📚 模型参数资料</h3>
+    <p>从 DataLearner 抓参数量/上下文/发布时间用于展示与评分兜底；「免费/付费」标记后缀自动剥离后查询；负缓存可在「补全」时清除重试。</p>
+    <h3>❓ 常见问题</h3>
+    <p><b>端口占用：</b><span class="mono">Get-NetTCPConnection -LocalPort 18123</span> → Stop-Process。<br>
+    <b>502：</b>看监控日志最后错误，多为上游 Key 失效；熔断+Fallback 自动换家。<br>
+    <b>数据位置：</b>配置 <span class="mono">data\config.json</span>；日志 <span class="mono">logs\gateway.log</span>；参数缓存 <span class="mono">data\model_params.json</span></p>
+  </div>
+</section>
+
+<!-- ============ 供应商编辑弹窗 ============ -->
+<div class="overlay" id="supOverlay">
+  <div class="modal">
+    <h3 id="supModalTitle">新增供应商</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><label class="hint">ID（唯一）</label><input id="f_id" style="width:100%"></div>
+      <div><label class="hint">名称</label><input id="f_name" style="width:100%"></div>
+      <div style="grid-column:1/3"><label class="hint">BaseURL</label><input id="f_base" style="width:100%" placeholder="https://xxx/v1"></div>
+      <div><label class="hint">协议</label><select id="f_proto" style="width:100%"><option value="openai">openai</option><option value="anthropic">anthropic</option><option value="gemini">gemini</option></select></div>
+      <div><label class="hint">配额</label><select id="f_quota" style="width:100%"><option value="unlimited">unlimited</option><option value="limited">limited（免费）</option></select></div>
+      <div><label class="hint">代理（可选）</label><input id="f_proxy" style="width:100%" placeholder="http://127.0.0.1:7890"></div>
+      <div><label class="hint">Fallback 链（逗号分隔其它ID）</label><input id="f_fallback" style="width:100%"></div>
+      <div><label class="hint">熔断阈值 / 重置秒</label><div class="flex"><input id="f_bth" type="number" value="3" style="width:80px"> / <input id="f_brs" type="number" value="30" style="width:80px"></div></div>
+      <div><label class="hint">能力权重（0=按测评/参数自动推断）</label><input id="f_cap" type="number" step="0.1" min="0" value="0" style="width:100%"></div>
+    </div>
+    <label class="hint" style="display:block;margin-top:8px">Keys（每行：key 或 key | 模型A,模型B；免Key填 __KEYLESS__）</label>
+    <textarea id="f_keys" rows="3" class="mono" style="width:100%"></textarea>
+    <label class="hint" style="display:block;margin-top:8px">模型（每行：id | 上下文 | 多模态0/1 | off=停用）</label>
+    <textarea id="f_models" rows="4" class="mono" style="width:100%"></textarea>
+    <div class="flex" style="margin-top:10px">
+      <button class="ghost small" onclick="testUpstream()">🔍 测试连通 &amp; 拉模型</button>
+      <button class="ghost small" onclick="fillModels()">⬇ 将拉到的模型填入上面</button>
+      <span class="hint" id="testState"></span></div>
+    <div class="testbox" id="testBox"></div>
+    <div class="flex" style="margin-top:14px;justify-content:flex-end">
+      <button class="ghost" onclick="closeSupModal()">取消</button>
+      <button onclick="saveSupplier()">保存</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUP=(location.hostname==='127.0.0.1'&&location.port==='18123')?'':'http://127.0.0.1:18123';
+let CFG=null,editingId=null,fetchedModels=null;
+const $=id=>document.getElementById(id);
+async function api(p,o){const r=await fetch(SUP+p,o);return r.json();}
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2000);}
+function fmtTok(n){n=+n||0;return n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n);}
+
+document.querySelectorAll('.tab-btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');$('tab-'+b.dataset.tab).classList.add('active');
+  if(b.dataset.tab==='mon'){loadHealth();loadLogs();loadMetrics();loadProbe();loadUsage();loadAuto();}
+  if(b.dataset.tab==='route'){renderRoutes();renderCustomRoutes();}
+});
+
+/* ---------- 路由页 ---------- */
+function keyLimit(s){
+  const lim=(s.keys||[]).filter(k=>typeof k==='object'&&k.supportedModels&&k.supportedModels.length)
+    .map(k=>String(k.key).slice(0,8)+'…→'+k.supportedModels.length+'个');
+  return lim.length?lim.join('；'):'全部模型';
+}
+function renderRoutes(){
+  [['Free','free'],['Paid','vip']].forEach(([sfx,pool])=>{
+    const tb=$('route'+sfx);tb.innerHTML='';
+    const members=CFG.pools[pool]||[];
+    let sups=(CFG.suppliers||[]).filter(s=>members.includes(s.id));
+    if(!sups.length){tb.innerHTML='<tr><td colspan="8" class="hint" style="padding:14px">该池暂无供应商</td></tr>';return;}
+    const on=sups.filter(s=>s.enabled!==false);
+    const ordered=[...on.filter(s=>s.quota!=='limited'),...on.filter(s=>s.quota==='limited')];
+    ordered.forEach((s,i)=>{
+      tb.insertAdjacentHTML('beforeend','<tr><td><b>'+(i+1)+'</b></td><td class="mono">'+s.id+'</td><td>'+(s.protocol||'openai')+'</td>'
+        +'<td><span class="tag '+(s.quota==='limited'?'t-free':'t-paid')+'">'+(s.quota||'unlimited')+'</span></td>'
+        +'<td class="mono">'+(s.breaker?s.breaker.threshold+'/'+s.breaker.reset+'s':'-')+'</td>'
+        +'<td class="mono">'+((s.fallback||[]).join(' → ')||'-')+'</td>'
+        +'<td class="mono">'+keyLimit(s)+'</td><td>'+((s.models||[]).filter(m=>m.enabled!==false).length)+'</td></tr>');});
+    sups.filter(s=>s.enabled===false).forEach(s=>{
+      tb.insertAdjacentHTML('beforeend','<tr style="opacity:.45"><td>-</td><td class="mono">'+s.id+'</td><td colspan="7"><span class="tag t-off">已停用</span></td></tr>');});
+  });
+}
+
+/* ---------- 配置 ---------- */
+async function loadCfg(){CFG=await api('/api/config');renderSup();fillSettings();renderRoutes();renderCustomRoutes();}
+
+/* ---------- 自定义路由 ---------- */
+function renderCustomRoutes(){
+  const tb=$('crBody');tb.innerHTML='';
+  const cr=CFG.customRoutes||{};
+  const names=Object.keys(cr);
+  if(!names.length){tb.innerHTML='<tr><td colspan="4" class="hint" style="padding:14px">还没有自定义路由。在下方添加，例如 auto2 = 你挑选的几个模型，之后聊天框填 auto2 即只在这些模型里调度。</td></tr>';return;}
+  names.forEach(n=>{
+    const models=(cr[n].models||[]);
+    tb.insertAdjacentHTML('beforeend','<tr><td class="mono"><b>'+n+'</b></td><td>'+models.length+'</td>'
+      +'<td class="mono hint" style="max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+models.join(', ')+'</td>'
+      +'<td><button class="small ghost" onclick="editRoute(\''+n+'\')">编辑</button> '
+      +'<button class="small ghost" onclick="delRoute(\''+n+'\')">删除</button></td></tr>');});
+}
+let editingRoute=null;
+function editRoute(n){
+  editingRoute=n;
+  $('crName').value=n;
+  $('crModels').value=(((CFG.customRoutes||{})[n]||{}).models||[]).join('\n');
+  $('crName').disabled=true;
+}
+function resetRouteForm(){editingRoute=null;$('crName').value='';$('crModels').value='';$('crName').disabled=false;}
+async function saveRoute(){
+  const name=($('crName').value||'').trim().toLowerCase();
+  if(!name){toast('请填路由名');return;}
+  if(['auto','fast','daily','vision'].includes(name)){toast('该名字为内置别名，请换一个');return;}
+  const models=$('crModels').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(!models.length){toast('至少填一个模型 ID');return;}
+  CFG.customRoutes=CFG.customRoutes||{};
+  CFG.customRoutes[name]={models:models};
+  await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(CFG)});
+  toast('已保存路由 '+name+'（聊天框填 '+name+' 即生效）');
+  resetRouteForm();loadCfg();
+}
+async function delRoute(n){
+  if(!confirm('删除路由 '+n+' ？'))return;
+  delete CFG.customRoutes[n];
+  await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(CFG)});
+  toast('已删除 '+n);loadCfg();
+}
+
+/* ---------- 供应商 ---------- */
+function renderSup(){
+  const tb=$('supBody');tb.innerHTML='';
+  (CFG.suppliers||[]).forEach(s=>{
+    const tr=document.createElement('tr');
+    const pools=Object.entries(CFG.pools||{}).filter(([,v])=>v.includes(s.id)).map(([k])=>k).join(',')||'-';
+    tr.innerHTML='<td class="mono">'+s.id+'</td><td>'+(s.name||'')+'</td><td class="mono">'+(s.baseUrl||'')+'</td>'
+      +'<td>'+(s.protocol||'openai')+'</td>'
+      +'<td><span class="tag '+(s.quota==='limited'?'t-free':'t-paid')+'">'+(s.quota||'unlimited')+'</span></td>'
+      +'<td class="mono">'+(s.proxy?'✓':'-')+'</td><td>'+((s.keys||[]).length)+'</td>'
+      +'<td>'+((s.models||[]).filter(m=>m.enabled!==false).length)+'/'+((s.models||[]).length)+'</td>'
+      +'<td class="mono">'+((s.fallback||[]).join(',')||'-')+'</td>'
+      +'<td class="mono">'+(s.breaker?s.breaker.threshold+'/'+s.breaker.reset:'-')+'</td>'
+      +'<td><span class="tag '+(s.enabled===false?'t-off':'t-paid')+'">'+(s.enabled===false?'停用':'启用')+'</span> '+pools+'</td>';
+    const ops=document.createElement('td');
+    ['⇅同步','编辑','启停','删除'].forEach(t=>{
+      const btn=document.createElement('button');btn.className='small ghost';btn.style.marginRight='6px';btn.textContent=t;
+      btn.onclick=()=>{
+        if(t==='⇅同步')syncModels(s.id);
+        else if(t==='编辑')openSupModal(s.id);
+        else if(t==='启停'){s.enabled=s.enabled===false;upsert(s);}
+        else if(t==='删除'&&confirm('确认删除 '+s.id+' ？'))delSupplier(s.id);};
+      ops.appendChild(btn);});
+    tr.appendChild(ops);tb.appendChild(tr);});
+}
+async function upsert(s){await api('/api/suppliers/upsert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(s)});toast('已保存 '+s.id);loadCfg();}
+async function delSupplier(id){await api('/api/suppliers/'+id,{method:'DELETE'});toast('已删除 '+id);loadCfg();}
+async function syncModels(id){
+  const s=CFG.suppliers.find(x=>x.id===id);if(!s)return;
+  let key='';const ks=s.keys||[];
+  const plain=ks.find(k=>typeof k==='object'?!k.supportedModels:true);
+  key=plain?(typeof plain==='object'?plain.key:plain):(ks[0]?(typeof ks[0]==='object'?ks[0].key:ks[0]):'');
+  toast('⇅ 正在拉取 '+id+' …');
+  const r=await api('/api/supplier/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({baseUrl:s.baseUrl,key})});
+  if(!r.ok){toast('❌ '+(r.error||''));return;}
+  const have=new Set((s.models||[]).map(m=>m.id));
+  const added=(r.models||[]).filter(mid=>!have.has(mid));
+  s.models=[...(s.models||[]),...added.map(m=>({id:m,enabled:false}))];
+  await upsert(s);
+  toast('✅ '+id+': 新增 '+added.length+' 个(默认停用)');
+}
+
+function openSupModal(id){
+  editingId=id||null;fetchedModels=null;
+  $('supModalTitle').textContent=id?('编辑 '+id):'新增供应商';
+  const s=id?CFG.suppliers.find(x=>x.id===id):null;
+  f_id.value=s?s.id:'';f_name.value=s?(s.name||''):'';f_base.value=s?(s.baseUrl||''):'';
+  f_proto.value=s?(s.protocol||'openai'):'openai';f_quota.value=s?(s.quota||'unlimited'):'unlimited';
+  f_proxy.value=s?(s.proxy||''):'';f_fallback.value=s?(s.fallback||[]).join(','):'';
+  f_bth.value=s&&s.breaker?s.breaker.threshold:3;f_brs.value=s&&s.breaker?s.breaker.reset:30;
+  f_cap.value=(s&&s.capability!=null)?s.capability:0;
+  f_keys.value=s?(s.keys||[]).map(k=>typeof k==='object'?[k.key,(k.supportedModels||[]).join(',')].filter(Boolean).join(' | '):k).join('\n'):'';
+  f_models.value=s?(s.models||[]).map(m=>[m.id,m.contextWindow||'',m.multimodal?'1':'',m.enabled===false?'off':''].join(' | ').replace(/(\s*\|\s*)+$/,'')).join('\n'):'';
+  $('testBox').style.display='none';$('testBox').textContent='';
+  document.getElementById('supOverlay').classList.add('show');
+}
+function closeSupModal(){document.getElementById('supOverlay').classList.remove('show');}
+async function testUpstream(){
+  const keyLine=f_keys.value.split('\n')[0]||'';const key=keyLine.split('|')[0].trim();
+  $('testState').textContent='测试中…';
+  const r=await api('/api/supplier/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({baseUrl:f_base.value,key})});
+  const box=$('testBox');box.style.display='block';
+  if(r.ok){fetchedModels=r.models;box.textContent='✅ ('+r.status+') 共'+r.count+'个:\n'+r.models.slice(0,60).join('\n');$('testState').textContent='';}
+  else{box.textContent='❌ '+r.error;$('testState').textContent='';}
+}
+function fillModels(){if(!fetchedModels){toast('先测试拉取模型');return;}f_models.value=fetchedModels.join('\n');}
+async function saveSupplier(){
+  const sup={id:f_id.value.trim(),name:f_name.value.trim()||f_id.value.trim(),
+    baseUrl:f_base.value.trim().replace(/\/$/,''),protocol:f_proto.value,quota:f_quota.value,
+    proxy:f_proxy.value.trim()||null,enabled:true,
+    fallback:f_fallback.value.split(',').map(x=>x.trim()).filter(Boolean),
+    breaker:{threshold:+f_bth.value||3,reset:+f_brs.value||30},
+    capability:(parseFloat(f_cap.value)||0)>0?parseFloat(f_cap.value):null,
+    keys:f_keys.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+      const parts=l.split('|').map(x=>x.trim());
+      return parts[1]?{key:parts[0],supportedModels:parts[1].split(',').map(x=>x.trim()).filter(Boolean)}:parts[0];}),
+    models:f_models.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+      const p=l.split('|').map(x=>x.trim());
+      const m={id:p[0],enabled:(p[3]||'').toLowerCase()!=='off'};
+      if(p[1])m.contextWindow=+p[1]||0;if(p[2]==='1')m.multimodal=true;return m;})};
+  if(!sup.id||!sup.baseUrl){toast('ID 和 BaseURL 必填');return;}
+  if(CFG.suppliers.find(x=>x.id===sup.id)){const old=CFG.suppliers.find(x=>x.id===sup.id);sup.enabled=old.enabled!==false;}
+  await upsert(sup);closeSupModal();
+}
+
+/* ---------- 监控 ---------- */
+async function loadHealth(){
+  try{
+    const h=await api('/api/health');const g=$('healthGrid');g.innerHTML='';
+    h.suppliers.forEach(s=>{
+      const rate=((s.rate??1)*100).toFixed(0);
+      const dotCls=s.breaker.state==='open'?'s-open':(s.fail&&!s.success?'s-err':(s.last_error?'s-open':(s.success?'s-ok':'s-off')));
+      g.insertAdjacentHTML('beforeend','<div class="card"><h3>'+s.id+' <span class="tag '+(s.quota==='limited'?'t-free':'t-paid')+'">'+(s.quota||'')+'</span></h3>'
+        +'<div class="row"><span>协议</span><b>'+s.protocol+'</b></div>'
+        +'<div class="row"><span>熔断</span><span><i class="dot '+dotCls+'"></i>'+s.breaker.state+'</span></div>'
+        +'<div class="row"><span>成功/失败</span><b>'+s.success+' / '+s.fail+'</b></div>'
+        +'<div class="bar"><i style="width:'+rate+'%"></i></div>'
+        +'<div class="row"><span>延迟</span><b>'+(s.last_latency!=null?s.last_latency+'s':'-')+'</b></div>'
+        +'<div class="row"><span>错误</span><b style="color:var(--err)">'+(s.last_error||'-').slice(0,40)+'</b></div></div>');});
+    $('supTip').textContent='可用: '+h.suppliers.filter(x=>x.breaker.state!=='open'&&x.enabled!==false).map(x=>x.id).join(', ');
+  }catch(e){}
+}
+async function loadLogs(){try{const r=await fetch(SUP+'/api/logs?lines=300');$('logbox').textContent=await r.text()||'（空）';}catch(e){}}
+async function loadMetrics(){
+  try{
+    const m=await api('/api/metrics?minutes=30');
+    $('reqTotal').textContent=m.total;
+    $('reqPer').textContent=(Object.entries(m.per_supplier||{}).slice(0,6).map(([k,v])=>k+':'+v).join(' · '))||'-';
+    const w=880,h=150,pad=26,max=Math.max(...m.counts,1),n=m.labels.length,bw=(w-pad*2)/n;
+    let svg='<svg width="100%" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">';
+    svg+='<line x1="'+pad+'" y1="'+(h-22)+'" x2="'+(w-pad/2)+'" y2="'+(h-22)+'" stroke="#2a2f3a"/>';
+    m.counts.forEach((c,i)=>{
+      const bh=(h-46)*(c/max),x=pad+i*bw;
+      if(c>0)svg+='<rect x="'+(x+1)+'" y="'+(h-22-bh)+'" width="'+Math.max(bw-2,1.5)+'" height="'+bh+'" fill="#58a6ff" rx="2"></rect>';
+      if(i%5===0)svg+='<text x="'+x+'" y="'+(h-7)+'" font-size="9" fill="#8b93a3">'+m.labels[i]+'</text>';});
+    svg+='</svg>';$('reqChart').innerHTML=svg;
+  }catch(e){}
+}
+async function loadAuto(){
+  try{
+    const r=await api('/api/auto/stats?hours=24');
+    const tb=$('autoBody');tb.innerHTML='';
+    $('autoTotal').textContent=r.total?(r.total+' 次（近'+(r.hours||24)+'小时）'):'暂无数据';
+    const cats=Object.entries(r.by_category||{});const byVia=r.by_via||{};const tops=r.top_targets_per_category||{};
+    if(!cats.length){tb.innerHTML='<tr><td colspan="5" class="hint" style="padding:12px">暂无 auto 数据——发一条 model=auto 的请求即可</td></tr>';}
+    cats.sort((a,b)=>b[1].count-a[1].count);
+    cats.forEach(pair=>{
+      const cat=pair[0],info=pair[1];
+      const pct=r.total?((info.count/r.total)*100).toFixed(1)+'%':'-';
+      const via=(Object.entries(byVia).map(kv=>kv[0]+':'+kv[1]).join(' '))||'-';
+      const top=((tops[cat]||[]).slice(0,2).map(t=>t.target+'('+t.count+')').join(', '))||'-';
+      tb.insertAdjacentHTML('beforeend','<tr><td><b>'+cat+'</b></td><td>'+info.count+'</td><td>'+pct+'</td><td class="hint">'+via+'</td><td class="hint">'+top+'</td></tr>');});
+  }catch(e){}
+}
+async function loadProbe(){
+  try{
+    const r=await api('/api/probe/report');
+    const tb=$('probeBody');tb.innerHTML='';
+    (r.rows||[]).forEach((row,i)=>{
+      const sr=row.success_rate!=null?((row.success_rate*100).toFixed(0)+'%'):'-';
+      tb.insertAdjacentHTML('beforeend','<tr><td><b>'+(i+1)+'</b></td>'
+        +'<td class="mono">'+row.id+(row.preferred?' ⭐':'')+(row.recommended?' 🏆':'')+'</td>'
+        +'<td>'+((row.pools||[]).join(',')||'-')+'</td><td>'+sr+'</td>'
+        +'<td>'+(row.avg_latency!=null?row.avg_latency+'s':'-')+'</td><td>'+row.stability+'</td><td>'+row.speed+'</td>'
+        +'<td title="'+(row.capability_source||'')+'">'+row.capability+(row.bench_score!=null?('('+row.bench_score+')'):'')+'</td>'
+        +'<td><b style="color:var(--acc)">'+row.score+'</b></td>'
+        +'<td>'+(row.recommended?'<button class="small" onclick="applyProbe()">⭐ 采纳</button>':'')+'</td></tr>');});
+    const pm=$('pmBody');pm.innerHTML='';let mrows=[];
+    (r.rows||[]).forEach(row=>(row.models_health||[]).forEach(m=>mrows.push({sid:row.id,model:m.model,n:m.n,rate:m.rate,avg_latency:m.avg_latency})));
+    if(!mrows.length)pm.innerHTML='<tr><td colspan="6" class="hint" style="padding:12px">暂无探测数据，点「立即探测」开始</td></tr>';
+    mrows.forEach(m=>{
+      const st=m.rate>=0.99?'正常':(m.rate>=0.5?'不稳':'异常');
+      pm.insertAdjacentHTML('beforeend','<tr><td class="mono">'+m.sid+'</td><td class="mono">'+m.model+'</td><td>'+m.n+'</td><td>'+((m.rate*100).toFixed(0))+'%</td><td>'+m.avg_latency+'s</td><td>'+st+'</td></tr>');});
+    const ap=r.cfg||{};
+    $('probeState').textContent=((ap.enabled)?('开 · '+ap.intervalMinutes+'分钟/轮 · 每轮'+(ap.probeModelsPerRound||2)+'模型'):'关')
+      +' · 上轮 '+(r.status.last_run?new Date(r.status.last_run*1000).toLocaleTimeString():'未运行');
+  }catch(e){}
+}
+async function runProbe(){try{await api('/api/probe/run',{method:'POST'});}catch(e){}loadProbe();}
+async function applyProbe(){const r=await api('/api/probe/apply',{method:'POST'});if(r.ok){toast('⭐ 已采纳 '+r.applied);loadCfg();}}
+async function loadUsage(){
+  try{
+    const u=await api('/api/usage?hours=24');const tb=$('usageBody');tb.innerHTML='';
+    const sups=u.by_supplier||{};
+    if(!Object.keys(sups).length){tb.innerHTML='<tr><td colspan="6" class="hint" style="padding:12px">近24小时暂无请求</td></tr>';return;}
+    Object.entries(sups).sort((a,b)=>b[1].total_tokens-a[1].total_tokens).forEach(pair=>{
+      const sid=pair[0],v=pair[1];
+      const tops=(u.top_models_per_supplier||{})[sid]||[];
+      const top=tops[0]?(tops[0][0]+' ('+fmtTok(tops[0][1].total_tokens)+')'):'-';
+      tb.insertAdjacentHTML('beforeend','<tr><td class="mono">'+sid+'</td><td>'+v.requests+'</td><td>'+fmtTok(v.prompt_tokens)+'</td><td>'+fmtTok(v.completion_tokens)+'</td><td><b>'+fmtTok(v.total_tokens)+'</b></td><td class="mono">'+top+'</td></tr>');});
+  }catch(e){}
+}
+let logTimer=null;
+function logAutoTick(){if(logTimer){clearInterval(logTimer);logTimer=null;}if($('logAuto').checked){loadLogs();logTimer=setInterval(loadLogs,4000);}}
+
+/* ---------- 设置 ---------- */
+function fillSettings(){
+  $('sysPrompt').value=CFG.systemPromptTemplate||'';$('sysMode').value=CFG.systemPromptMode||'append';$('defPool').value=CFG.defaultPool||'';
+  const tc=CFG.tokenCompression||{};tcOn.checked=!!tc.enabled;tcMax.value=tc.maxContextTokens||8000;tcStrategy.value=tc.strategy||'truncate';
+  const ap=CFG.autoProbe||{};apOn.checked=ap.enabled!==false;apMin.value=ap.intervalMinutes||15;apTo.value=ap.timeoutSeconds||20;apPer.value=ap.probeModelsPerRound||2;
+  const sr=CFG.smartRouting||{};srOn.checked=!!sr.enabled;
+  srModel.value=(sr.classifier||{}).model||'';srPool.value=(sr.classifier||{}).pool||'';srTo.value=(sr.classifier||{}).timeoutSeconds||4;
+}
+async function resetSettings(){
+  if(!confirm('确定恢复默认设置吗？\n模型数据 / 自定义路由会保留，仅重置偏好设置。'))return;
+  await api('/api/settings/reset',{method:'POST'});
+  toast('已恢复默认设置');loadCfg();
+}
+async function saveSettings(){
+  CFG.systemPromptTemplate=$('sysPrompt').value;CFG.systemPromptMode=sysMode.value;
+  CFG.defaultPool=defPool.value||null;
+  CFG.tokenCompression={enabled:tcOn.checked,maxContextTokens:+tcMax.value||8000,strategy:tcStrategy.value};
+  CFG.autoProbe={enabled:apOn.checked,intervalMinutes:+apMin.value||15,timeoutSeconds:+apTo.value||20,probeModelsPerRound:+apPer.value||2};
+  const sr=CFG.smartRouting||{rules:{},routes:{}};
+  CFG.smartRouting=Object.assign({},sr,{enabled:srOn.checked,
+    classifier:{model:srModel.value.trim(),pool:srPool.value,timeoutSeconds:+srTo.value||4,maxChars:((sr.classifier||{}).maxChars)||500}});
+  await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(CFG)});
+  toast('设置已保存');
+}
+
+/* ---------- 聊天 ---------- */
+let convs=[],cur=null,busy=false;
+function loadConvs(){try{convs=JSON.parse(localStorage.getItem('agc_panel_convs_pro')||'[]')}catch(e){convs=[]}if(!convs.length)newConv();else{cur=convs[0];renderConvs();renderMsgs();}}
+function saveConvs(){localStorage.setItem('agc_panel_convs_pro',JSON.stringify(convs));}
+function newConv(){cur={id:Date.now(),title:'新会话',msgs:[]};convs.unshift(cur);saveConvs();renderConvs();renderMsgs();}
+function renderConvs(){const el=$('convList');el.innerHTML='';convs.forEach(c=>{const d=document.createElement('div');d.className='conv'+(c.id===cur.id?' active':'');d.textContent=c.title;d.onclick=()=>{cur=c;renderConvs();renderMsgs();};el.appendChild(d);});}
+function bubble(m){
+  const w=document.createElement('div');w.className='msg '+(m.role==='user'?'me':'ai');
+  const who=document.createElement('div');who.className='who';who.textContent=m.role==='user'?'你':(m.model||'AI');w.appendChild(who);
+  if(m.reasoning){const r=document.createElement('div');r.className='reason';r.textContent='💭 '+m.reasoning;w.appendChild(r);}
+  const b=document.createElement('div');b.className='bubble';b.textContent=m.content||'';w.appendChild(b);
+  w._bubble=b;w._who=who;return w;
+}
+function renderMsgs(){const el=$('msgs');el.innerHTML='';(cur.msgs||[]).forEach(m=>el.appendChild(bubble(m)));el.scrollTop=el.scrollHeight;}
+async function send(){
+  if(busy)return;const text=txt.value.trim();if(!text)return;
+  txt.value='';
+  if(cur.msgs.length===0)cur.title=text.slice(0,20);
+  cur.msgs.push({role:'user',content:text});saveConvs();renderConvs();renderMsgs();
+  busy=true;sendBtn.disabled=true;
+  const msgsEl=$('msgs');
+  const aim={role:'assistant',content:'',reasoning:'',model:''};
+  const ai=bubble(aim);msgsEl.appendChild(ai);msgsEl.scrollTop=msgsEl.scrollHeight;
+  const body={model:model.value,messages:cur.msgs.map(m=>({role:m.role,content:m.content})),stream:true};
+  const tp=parseFloat(temp.value);if(!isNaN(tp))body.temperature=tp;
+  if(maxtok.value&&+maxtok.value>0)body.max_tokens=+maxtok.value;
+  const P=poolSel.value;
+  try{
+    const resp=await fetch(SUP+'/v1/chat/completions'+(P?('?pool='+P):''),{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer local'},body:JSON.stringify(body)});
+    if(!resp.ok){const e=await resp.json().catch(()=>({error:resp.statusText}));aim.content='❌ '+(typeof e.error==='string'?e.error:resp.statusText);ai._bubble.textContent=aim.content;return;}
+    const reader=resp.body.getReader();const dec=new TextDecoder();let buf='';
+    while(true){const rd=await reader.read();if(rd.done)break;
+      buf+=dec.decode(rd.value,{stream:true});let i;
+      while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);
+        if(line.startsWith('data:')&&!line.includes('[DONE]')){
+          try{const d=JSON.parse(line.slice(5).trim());const delta=d.choices[0].delta||{};
+            if(delta.reasoning_content)aim.reasoning+=delta.reasoning_content;
+            if(delta.content)aim.content+=delta.content;
+            if(d.model&&!aim.model){aim.model=d.model;ai._who.textContent=d.model;}
+            ai.querySelectorAll('.reason').forEach(n=>n.remove());
+            if(aim.reasoning){const r=document.createElement('div');r.className='reason';r.textContent='💭 '+aim.reasoning;ai.insertBefore(r,ai._bubble);}
+            ai._bubble.textContent=aim.content||'▍';msgsEl.scrollTop=msgsEl.scrollHeight;
+          }catch(e){}}}}
+    if(!aim.content&&!aim.reasoning)ai._bubble.textContent='（空响应）';
+  }catch(e){aim.content='❌ 网络错误: '+e;ai._bubble.textContent=aim.content;}
+  finally{cur.msgs.push(aim);saveConvs();busy=false;sendBtn.disabled=false;}
+}
+txt.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+const poolSel=$('pool');
+
+/* ---------- init ---------- */
+loadCfg().then(()=>{loadHealth();loadConvs();renderMsgs();});
+setInterval(()=>{if($('tab-mon').classList.contains('active')){loadHealth();loadMetrics();loadUsage();}},8000);
+</script>
+</body>
+</html>

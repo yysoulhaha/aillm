@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>AI 模型助手 · 普通版</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--txt:#2b3245;--sub:#7a8299;--acc:#ff8c00;--ok:#22a55f;--warn:#e8a23d;--err:#e05555;--line:#eceef4}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Microsoft YaHei",system-ui,sans-serif}
+body{background:var(--bg);color:var(--txt);height:100vh;display:flex;flex-direction:column}
+header{background:#fff;border-bottom:1px solid var(--line);padding:10px 18px;display:flex;align-items:center;gap:18px}
+.logo{font-size:19px;font-weight:bold}.logo b{color:var(--acc)}
+nav{display:flex;gap:4px;margin-left:8px}
+.tab-btn{border:none;background:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:14px;color:var(--sub)}
+.tab-btn.active{background:#fff3e3;color:var(--acc);font-weight:bold}
+.mode-link{margin-left:auto;font-size:12px;color:var(--sub);text-decoration:none;border:1px solid var(--line);padding:5px 12px;border-radius:14px}
+.mode-link:hover{color:var(--acc);border-color:var(--acc)}
+.page{display:none;flex:1;overflow:auto;padding:16px 18px}
+.page.active{display:block}
+button{background:var(--acc);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px}
+button:hover{filter:brightness(1.06)}
+button.ghost{background:#fff;color:var(--txt);border:1px solid var(--line)}
+button.small{padding:4px 10px;font-size:12px}
+input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;background:#fff;color:var(--txt)}
+.hint{color:var(--sub);font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+
+#tab-chat.active{display:flex;gap:0;padding:0}
+.conv-side{width:190px;border-right:1px solid var(--line);padding:12px;overflow:auto;background:#fff}
+.conv{padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}
+.conv:hover,.conv.active{background:#fff3e3;color:var(--txt)}
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.msgs{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:78%}
+.msg .who{font-size:11px;color:var(--sub);margin-bottom:3px}
+.bubble{padding:10px 14px;border-radius:14px;line-height:1.65;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.me{align-self:flex-end;text-align:right}
+.me .bubble{background:var(--acc);color:#fff;border-bottom-right-radius:4px}
+.ai .bubble{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+.reason{background:#f4f0ff;border:1px dashed #c9b8f5;color:#6b52b8;border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:6px;white-space:pre-wrap}
+.inputbar{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--line)}
+.inputbar textarea{flex:1;resize:none;height:64px}
+
+.searchbar{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.mcard{display:flex;flex-direction:column;gap:8px}
+.mname{font-weight:bold;font-size:14px;word-break:break-all;line-height:1.35}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:11px;padding:2px 8px;border-radius:10px;background:#f2f4f9;color:var(--sub)}
+.chip.free{background:#e5f7ec;color:var(--ok)}
+.chip.paid{background:#fdf0dc;color:#c07b1a}
+.chip.score{background:#fff3e3;color:var(--acc);font-weight:bold}
+.chip.off{background:#eee;color:#aaa;text-decoration:line-through}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.s-ok{background:var(--ok)}.s-bad{background:var(--err)}.s-na{background:#ccc}
+.mdesc{font-size:12px;color:var(--sub);line-height:1.5;max-height:60px;overflow:hidden}
+.switchrow{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:8px}
+.tgl{position:relative;width:36px;height:20px;background:#ddd;border-radius:10px;cursor:pointer;transition:.2s;flex-shrink:0}
+.tgl.on{background:var(--ok)}
+.tgl::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s}
+.tgl.on::after{left:18px}
+
+.stat-big{font-size:26px;font-weight:bold;color:var(--acc)}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(30,34,48,.45);z-index:50;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:14px;padding:22px;width:min(560px,92vw);max-height:88vh;overflow:auto}
+.modal h3{margin-bottom:14px}
+.frm2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label.f{display:block;font-size:12px;color:var(--sub);margin:8px 0 4px}
+.modal input,.modal select,.modal textarea{width:100%}
+.testbox{background:#f7f8fc;border-radius:8px;padding:10px;margin-top:10px;font-size:12px;white-space:pre-wrap;max-height:200px;overflow:auto;display:none}
+.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#333c;color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;display:none;z-index:99}
+details.adv summary{cursor:pointer;color:var(--sub);font-size:13px;padding:6px 0}
+details.adv[open] summary{color:var(--acc)}
+.setrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:8px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🤖 AI <b>模型助手</b><span class="hint">普通版</span></div>
+  <nav>
+    <button class="tab-btn active" data-tab="status">📊 使用情况</button>
+    <button class="tab-btn" data-tab="chat">💬 对话</button>
+    <button class="tab-btn" data-tab="models">🧩 模型广场</button>
+    <button class="tab-btn" data-tab="set">⚙️ 设置</button>
+  </nav>
+  <a class="mode-link" href="/pro" onclick="localStorage.setItem('agc_ui_mode','pro')">🛠️ 切换到专业版</a>
+</header>
+
+<!-- ============ 对话 ============ -->
+<section class="page" id="tab-chat">
+  <div class="conv-side">
+    <h3 style="font-size:14px;margin-bottom:8px">会话 <button class="small ghost" onclick="newConv()">＋</button></h3>
+    <div id="convList"></div>
+  </div>
+  <div class="chat-main">
+    <div class="topbar">
+      <select id="model" style="min-width:200px"><option value="auto">🎯 自动挑最合适的（全部模型中选）</option></select>
+      <span class="hint" id="supTip"></span>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="inputbar">
+      <textarea id="txt" placeholder="输入消息，Enter 发送 / Shift+Enter 换行"></textarea>
+      <button id="sendBtn" onclick="send()">发送</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 模型广场 ============ -->
+<section class="page" id="tab-models">
+  <div class="searchbar">
+    <input id="mFilter" placeholder="🔍 输入名字筛选…" style="flex:1;max-width:320px" oninput="renderModels()">
+    <button class="ghost" onclick="openSupModal()">＋ 添加模型源</button>
+    <button class="ghost small" onclick="refreshParams()" title="从 DataLearner 抓取参数量、上下文等信息">🔄 补全模型资料</button>
+    <span class="hint" id="paramsState"></span>
+  </div>
+  <div class="grid" id="modelGrid"></div>
+</section>
+
+<!-- ============ 使用情况（首页） ============ -->
+<section class="page active" id="tab-status">
+  <div class="grid" style="margin-bottom:14px">
+    <div class="card" style="text-align:center">
+      <div class="stat-big" id="stTokens">0</div><div class="hint">近24小时 Token 用量</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div class="stat-big" id="stSaved">¥0.00</div><div class="hint">估算省下的 API 费用</div>
+    </div>
+    <div class="card" style="text-align:center"><div class="stat-big" id="stTotal">0</div><div class="hint">近30分钟对话次数</div></div>
+    <div class="card" style="text-align:center"><div class="stat-big" id="stModels">0</div><div class="hint">可用模型数</div></div>
+  </div>
+  <div class="hint" style="margin-bottom:8px">各模型源状态</div>
+  <div class="grid" id="healthGrid"></div>
+
+  <div class="hint" style="margin:14px 0 8px">Token 消耗明细（近 24 小时，按来源）</div>
+  <div class="card" style="padding:0"><table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead><tr><th style="text-align:left;padding:8px 12px;color:var(--sub)">来源</th><th style="text-align:left;padding:8px 12px;color:var(--sub)">次数</th><th style="text-align:left;padding:8px 12px;color:var(--sub)">Tokens</th><th style="text-align:left;padding:8px 12px;color:var(--sub)">最常用模型</th></tr></thead>
+    <tbody id="usageBody"></tbody></table></div>
+
+  <details class="adv card" style="margin-top:14px">
+    <summary style="color:var(--acc);font-weight:bold">📖 怎么在其它软件里使用？（ChatBox / NextChat / 沉浸式翻译 等）</summary>
+    <div style="margin-top:10px;font-size:13px;line-height:2">
+      只需要填三项，任何支持「自定义 OpenAI 接口」的软件都能用：<br>
+      ① 接口地址(Base URL)：<b>http://127.0.0.1:18123/v1</b><br>
+      ② API Key：随便填，比如 <b>local</b><br>
+      ③ 模型名：填 <b>auto</b> 就行——系统会自动帮你挑最合适的模型；也可以在「模型广场」里挑具体名字<br><br>
+      <span class="hint">命令行调用示例：<br>
+      curl http://127.0.0.1:18123/v1/chat/completions -H "Content-Type: application/json" -d "{\"model\":\"auto\",\"messages\":[{\"role\":\"user\",\"content\":\"你好\"}]}"</span>
+    </div>
+  </details>
+
+  <div class="hint" style="margin:14px 0 8px">最近动态</div>
+  <div class="card"><pre id="logbox" style="font-size:12px;white-space:pre-wrap;max-height:220px;overflow:auto">（暂无）</pre></div>
+</section>
+
+<!-- ============ 设置 ============ -->
+<section class="page" id="tab-set">
+  <div class="card" style="margin-bottom:12px">
+    <h3 style="margin-bottom:8px">🧠 自动挑选模型</h3>
+    <p class="hint" style="margin-bottom:8px">开启后，「自动」会在你所有可用模型里按问题难度匹配：简单问题用快模型，复杂问题用强模型。</p>
+    <label class="hint"><input type="checkbox" id="srOn"> 开启自动挑选</label>
+  </div>
+
+  <details class="adv card">
+    <summary>高级设置（一般不用动）</summary>
+    <div style="margin-top:10px">
+      <label class="f">全局系统提示词（每段对话都会附加）</label>
+      <textarea id="sysPrompt" rows="2" style="width:100%"></textarea>
+      <div class="setrow">
+        注入方式 <select id="sysMode"><option value="append">追加在前面</option><option value="override">替换原有</option></select>
+        默认使用 <select id="defPool"><option value="">全部额度</option><option value="free">免费额度</option><option value="vip">付费额度</option></select>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:10px 0">
+      <div class="setrow">
+        <label class="hint"><input type="checkbox" id="tcOn"> 长对话自动精简</label>
+        超过 <input id="tcMax" type="number" style="width:90px"> tokens 触发
+        <select id="tcStrategy"><option value="truncate">直接截断</option><option value="summarize">智能摘要</option></select>
+      </div>
+      <div class="setrow">
+        <label class="hint"><input type="checkbox" id="apOn"> 定时体检模型源</label>
+        每 <input id="apMin" type="number" min="5" style="width:70px"> 分钟一轮
+      </div>
+    </div>
+  </details>
+
+  <div style="margin-top:12px">
+    <button onclick="saveSettings()">💾 保存设置</button>
+    <button class="ghost" onclick="resetSettings()">↺ 恢复默认设置</button>
+    <span class="hint">恢复默认不会删除你已添加的模型，只重置上面这些开关和选项</span>
+  </div>
+</section>
+
+<!-- ============ 添加/编辑模型源弹窗（普通版精简）============ -->
+<div class="overlay" id="supOverlay">
+  <div class="modal">
+    <h3 id="supModalTitle">添加模型源</h3>
+    <p class="hint" style="margin-bottom:6px">模型源=提供 AI 模型的网站。填三样就能用：地址、密钥、点测试。</p>
+    <div class="frm2">
+      <div><label class="f">名字（英文标识）*</label><input id="f_id" placeholder="my-provider"></div>
+      <div><label class="f">显示名称</label><input id="f_name" placeholder="我的模型源"></div>
+    </div>
+    <label class="f">接口地址 *（一般以 /v1 结尾）</label>
+    <input id="f_base" placeholder="https://xxx.com/v1">
+    <div class="frm2" style="margin-top:8px">
+      <div><label class="f">接口格式</label><select id="f_proto"><option value="openai">标准 OpenAI 格式</option><option value="anthropic">Claude 格式</option><option value="gemini">Gemini 格式</option></select></div>
+      <div><label class="f">备用线路（可选，逗号分隔源名）</label><input id="f_fallback"></div>
+    </div>
+    <label class="f">密钥 Keys（每行一个；免密钥填 __KEYLESS__）</label>
+    <textarea id="f_keys" rows="3" class="mono"></textarea>
+    <label class="f">开放哪些模型（留空=点下面按钮自动获取；行尾加 off 表示停用）</label>
+    <textarea id="f_models" rows="4" class="mono"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+      <button class="ghost" onclick="testUpstream()">🔌 测试并获取模型列表</button>
+      <button class="ghost small" onclick="fillModels()">⬇ 填入上面</button>
+      <span class="hint" id="testState"></span>
+    </div>
+    <div class="testbox" id="testBox"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+      <button class="ghost" onclick="closeModal('supOverlay')">取消</button>
+      <button onclick="saveSupplier()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUP=(location.hostname==='127.0.0.1'&&location.port==='18123')?'':'http://127.0.0.1:18123';
+let CFG=null,CATALOG=null,editingId=null,fetchedModels=null;
+const $=id=>document.getElementById(id);
+async function api(p,o){const r=await fetch(SUP+p,o);return r.json();}
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2200);}
+function fmtTok(n){n=+n||0;return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(0)+'K':String(n);}
+
+document.querySelectorAll('.tab-btn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');$('tab-'+b.dataset.tab).classList.add('active');
+  if(b.dataset.tab==='models')loadCatalog();
+  if(b.dataset.tab==='status')loadStatus();
+});
+
+async function loadCfg(){CFG=await api('/api/config');fillSettings();fillModelSelect();renderConvs();}
+function fillModelSelect(){
+  const sel=$('model');const cur=sel.value;
+  sel.innerHTML='<option value="auto">🎯 自动挑最合适的（全部模型中选）</option>';
+  (CATALOG?.models||[]).filter(m=>m.enabled).forEach(m=>{
+    sel.insertAdjacentHTML('beforeend',`<option value="${m.model}">${m.model}</option>`);});
+  sel.value=cur||'auto';
+}
+
+/* ---------- 模型广场 ---------- */
+async function loadCatalog(){
+  CATALOG=await api('/api/catalog');
+  fillModelSelect();renderModels();
+  $('paramsState').textContent=`资料库 ${CATALOG.params_cache.ok} 个 · 待补 ${CATALOG.params_cache.miss} 个`;
+}
+function renderModels(){
+  const kw=($('mFilter').value||'').toLowerCase();
+  const g=$('modelGrid');g.innerHTML='';
+  let list=(CATALOG?.models||[]).filter(m=>!kw||m.model.toLowerCase().includes(kw)||m.supplier.includes(kw));
+  if(!list.length){g.innerHTML='<div class="hint" style="padding:30px">没有模型。点右上「＋添加模型源」开始。</div>';return;}
+  list.forEach(m=>{
+    const rate=m.success_rate;
+    const dot=rate==null?'s-na':(rate>=0.9?'s-ok':'s-bad');
+    const chips=[`<span class="chip ${m.quota==='limited'?'free':'paid'}">${m.quota==='limited'?'免费':'付费'}</span>`];
+    if(m.pools.includes('vip'))chips.push('<span class="chip paid">付费</span>');
+    if(m.params_text)chips.push(`<span class="chip">参数 ${m.params_text}</span>`);
+    if(m.ctx_text)chips.push(`<span class="chip">上下文 ${m.ctx_text}</span>`);
+    else if(m.ctx_local)chips.push(`<span class="chip">上下文 ${fmtTok(m.ctx_local)}</span>`);
+    if(m.multimodal)chips.push('<span class="chip">👁 看图</span>');
+    if(m.released)chips.push(`<span class="chip">${m.released} 发布</span>`);
+    chips.push(`<span class="chip score">★ ${m.bench_score}</span>`);
+    if(!m.enabled)chips.push('<span class="chip off">已停用</span>');
+    const d=document.createElement('div');d.className='card mcard';
+    d.innerHTML=`<div class="mname">${m.model}</div>
+      <div class="hint"><i class="dot ${dot}"></i>${m.supplier}${rate!=null?' · 成功率 '+(rate*100).toFixed(0)+'%':''}${m.avg_latency!=null?' · '+m.avg_latency+'s':''}</div>
+      <div class="chips">${chips.join('')}</div>
+      ${m.desc?`<div class="mdesc" title="${m.desc.replace(/"/g,'&quot;')}">${m.desc}</div>`:''}
+      <div class="switchrow"><span class="hint">${m.org||''}</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${m.source_url?`<a href="${m.source_url}" target="_blank" class="hint" style="font-size:11px">详情↗</a>`:''}
+          <div class="tgl ${m.enabled?'on':''}" onclick="tglModel('${m.supplier}','${m.model.replace(/'/g,"\\'")}',this)" title="启用/停用"></div>
+        </div></div>`;
+    g.appendChild(d);
+  });
+}
+async function tglModel(sid,mid,el){
+  const s=CFG.suppliers.find(x=>x.id===sid);if(!s)return;
+  const m=(s.models||[]).find(x=>x.id===mid);if(!m)return;
+  m.enabled=!m.enabled;el.classList.toggle('on',m.enabled);
+  await api('/api/suppliers/upsert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(s)});
+  toast(mid+(m.enabled?' 已启用':' 已停用'));loadCfg();loadCatalog();
+}
+async function refreshParams(){
+  $('paramsState').textContent='正在后台补全模型资料…';
+  try{await api('/api/model_params/refresh',{method:'POST'});}catch(e){toast('❌ '+e);return;}
+  let n=0;const timer=setInterval(async()=>{await loadCatalog();if(++n>=12)clearInterval(timer);},10000);
+}
+
+/* ---------- 使用情况（首页） ---------- */
+const SAVE_RATE = 0.02;   // 估算参考：主流 API 每千 token 均价(元)
+async function loadStatus(){
+  try{
+    const m=await api('/api/metrics?minutes=30');$('stTotal').textContent=m.total;
+    const u=await api('/api/usage?hours=24');let tk=0;
+    const tb=$('usageBody');tb.innerHTML='';const rows=Object.entries(u.by_supplier||{});
+    rows.forEach(pair=>{
+      const sid=pair[0],v=pair[1];tk+=v.total_tokens;
+      const tops=(u.top_models_per_supplier||{})[sid]||[];
+      const top=tops[0]?tops[0][0]:'-';
+      tb.insertAdjacentHTML('beforeend','<tr><td style="padding:8px 12px" class="mono">'+sid+'</td><td style="padding:8px 12px">'+v.requests+'</td><td style="padding:8px 12px"><b>'+fmtTok(v.total_tokens)+'</b></td><td style="padding:8px 12px" class="mono hint">'+top+'</td></tr>');});
+    if(!rows.length)tb.innerHTML='<tr><td colspan="4" class="hint" style="padding:14px">还没有使用记录，去「对话」页聊一句试试</td></tr>';
+    $('stTokens').textContent=fmtTok(tk);
+    $('stSaved').textContent='¥'+(tk/1000*SAVE_RATE).toFixed(2);
+    const c=await api('/api/catalog');$('stModels').textContent=(c.models||[]).filter(x=>x.enabled).length;
+    const h=await api('/api/health');const g=$('healthGrid');g.innerHTML='';
+    h.suppliers.forEach(s=>{
+      const ok=s.breaker.state!=='open'&&s.enabled!==false&&!(s.fail&&!s.success);
+      const d=document.createElement('div');d.className='card';
+      d.innerHTML=`<h3 style="font-size:14px;margin-bottom:6px"><i class="dot ${ok?'s-ok':'s-bad'}"></i>${s.id}</h3>
+        <div class="hint">成功 ${s.success} 次 · 失败 ${s.fail} 次<br>${s.last_latency!=null?'响应 '+s.last_latency+'s':'暂无响应记录'}<br>${s.last_error?('⚠️ '+s.last_error.slice(0,60)):'运行正常'}</div>`;
+      g.appendChild(d);
+    });
+    const r=await fetch(SUP+'/api/logs?lines=40');$('logbox').textContent=await r.text()||'（暂无）';
+  }catch(e){}
+}
+
+/* ---------- 对话 ---------- */
+let convs=[],cur=null,busy=false;
+function loadConvs(){try{convs=JSON.parse(localStorage.getItem('agc_panel_convs')||'[]')}catch(e){convs=[]}if(!convs.length)newConv(true);else{cur=convs[0];}}
+function saveConvs(){localStorage.setItem('agc_panel_convs',JSON.stringify(convs));}
+function newConv(silent){cur={id:Date.now(),title:'新会话',msgs:[]};convs.unshift(cur);saveConvs();renderConvs();renderMsgs();}
+function renderConvs(){const el=$('convList');el.innerHTML='';convs.forEach(c=>{const d=document.createElement('div');d.className='conv'+(c.id===cur.id?' active':'');d.textContent=c.title;d.onclick=()=>{cur=c;renderConvs();renderMsgs();};el.appendChild(d);});}
+function bubble(m){
+  const w=document.createElement('div');w.className='msg '+(m.role==='user'?'me':'ai');
+  const who=document.createElement('div');who.className='who';who.textContent=m.role==='user'?'你':(m.model||'AI');w.appendChild(who);
+  if(m.reasoning){const r=document.createElement('div');r.className='reason';r.textContent='💭 '+m.reasoning;w.appendChild(r);}
+  const b=document.createElement('div');b.className='bubble';b.textContent=m.content||'';w.appendChild(b);
+  w._bubble=b;w._who=who;return w;
+}
+function renderMsgs(){const el=$('msgs');el.innerHTML='';(cur.msgs||[]).forEach(m=>el.appendChild(bubble(m)));el.scrollTop=el.scrollHeight;}
+async function send(){
+  if(busy)return;const text=$('txt').value.trim();if(!text)return;
+  $('txt').value='';
+  if(cur.msgs.length===0)cur.title=text.slice(0,16);
+  cur.msgs.push({role:'user',content:text});saveConvs();renderConvs();renderMsgs();
+  busy=true;$('sendBtn').disabled=true;
+  const msgsEl=$('msgs');
+  const aim={role:'assistant',content:'',reasoning:'',model:''};
+  const ai=bubble(aim);msgsEl.appendChild(ai);msgsEl.scrollTop=msgsEl.scrollHeight;
+  // 不带 pool 参数 → 后端在所有启用模型中挑选
+  const body={model:$('model').value,messages:cur.msgs.map(m=>({role:m.role,content:m.content})),stream:true};
+  try{
+    const resp=await fetch(SUP+'/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer local'},body:JSON.stringify(body)});
+    if(!resp.ok){const e=await resp.json().catch(()=>({error:resp.statusText}));aim.content='❌ '+(typeof e.error==='string'?e.error:resp.statusText||resp.status);ai._bubble.textContent=aim.content;return;}
+    const reader=resp.body.getReader();const dec=new TextDecoder();let buf='';
+    while(true){const{done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});let i;
+      while((i=buf.indexOf('\n'))>=0){const line=buf.slice(0,i).trim();buf=buf.slice(i+1);
+        if(line.startsWith('data:')&&!line.includes('[DONE]')){
+          try{const d=JSON.parse(line.slice(5).trim());const delta=d.choices?.[0]?.delta||{};
+            if(delta.reasoning_content)aim.reasoning+=delta.reasoning_content;
+            if(delta.content)aim.content+=delta.content;
+            if(d.model&&!aim.model){aim.model=d.model;ai._who.textContent=d.model;}
+            ai.querySelectorAll('.reason').forEach(n=>n.remove());
+            if(aim.reasoning){const r=document.createElement('div');r.className='reason';r.textContent='💭 '+aim.reasoning;ai.insertBefore(r,ai._bubble);}
+            ai._bubble.textContent=aim.content||'▍';msgsEl.scrollTop=msgsEl.scrollHeight;
+          }catch(e){}
+        }}}
+    if(!aim.content&&!aim.reasoning)ai._bubble.textContent='（空响应）';
+  }catch(e){aim.content='❌ 网络错误: '+e;ai._bubble.textContent=aim.content;}
+  finally{cur.msgs.push(aim);saveConvs();busy=false;$('sendBtn').disabled=false;}
+}
+$('txt').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+
+/* ---------- 模型源弹窗 ---------- */
+function openModal(id){$(id).classList.add('show');}
+function closeModal(id){$(id).classList.remove('show');}
+function openSupModal(id){
+  editingId=id||null;fetchedModels=null;
+  $('supModalTitle').textContent=id?('编辑模型源 '+id):'添加模型源';
+  const s=id?CFG.suppliers.find(x=>x.id===id):null;
+  f_id.value=s?s.id:'';f_name.value=s?(s.name||''):'';f_base.value=s?(s.baseUrl||''):'';
+  f_proto.value=s?(s.protocol||'openai'):'openai';
+  f_keys.value=s?(s.keys||[]).map(k=>typeof k==='object'?[k.key,(k.supportedModels||[]).join(',')].filter(Boolean).join(' | '):k).join('\n'):'';
+  f_models.value=s?(s.models||[]).map(m=>[m.id,m.contextWindow||'',m.multimodal?'1':'',m.enabled===false?'off':''].join(' | ').replace(/(\s*\|\s*)+$/,'')).join('\n'):'';
+  f_fallback.value=s?(s.fallback||[]).join(','):'';
+  $('testBox').style.display='none';$('testBox').textContent='';
+  openModal('supOverlay');
+}
+async function testUpstream(){
+  const keyLine=f_keys.value.split('\n')[0]||'';const key=keyLine.split('|')[0].trim();
+  $('testState').textContent='测试中…';
+  const r=await api('/api/supplier/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({baseUrl:f_base.value,key})});
+  const box=$('testBox');box.style.display='block';
+  if(r.ok){fetchedModels=r.models;box.textContent='✅ 连接成功！共 '+r.count+' 个模型：\n'+r.models.slice(0,50).join('\n');$('testState').textContent='';}
+  else{box.textContent='❌ 连不上：'+r.error;$('testState').textContent='';}
+}
+function fillModels(){if(!fetchedModels){toast('请先点「测试并获取模型列表」');return;}f_models.value=fetchedModels.join('\n');toast('已填入 '+fetchedModels.length+' 个模型');}
+async function saveSupplier(){
+  const exist=CFG.suppliers.find(x=>x.id===f_id.value.trim());
+  // 普通版：收费类型与池归属不在表单出现——编辑保留原值，新增默认 unlimited
+  const sup={id:f_id.value.trim(),name:f_name.value.trim()||f_id.value.trim(),
+    baseUrl:f_base.value.trim().replace(/\/$/,''),protocol:f_proto.value,
+    quota:exist?(exist.quota||'unlimited'):'unlimited',
+    proxy:exist?(exist.proxy||null):null,enabled:exist?exist.enabled!==false:true,
+    fallback:f_fallback.value.split(',').map(x=>x.trim()).filter(Boolean),
+    breaker:exist?(exist.breaker||{threshold:3,reset:30}):{threshold:3,reset:30},
+    capability:exist?(exist.capability??null):null,
+    keys:f_keys.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+      const[k,s2]=l.split('|').map(x=>x.trim());
+      return s2?{key:k,supportedModels:s2.split(',').map(x=>x.trim()).filter(Boolean)}:k;}),
+    models:f_models.value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+      const p=l.split('|').map(x=>x.trim());
+      const m={id:p[0],enabled:(p[3]||'').toLowerCase()!=='off'};
+      if(p[1])m.contextWindow=+p[1]||0;if(p[2]==='1')m.multimodal=true;return m;})};
+  if(!sup.id||!sup.baseUrl){toast('名字和接口地址必填');return;}
+  if(exist)Object.assign(exist,sup);else CFG.suppliers.push(sup);
+  await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(CFG)});
+  toast('已保存 '+sup.id);closeModal('supOverlay');loadCfg();loadCatalog();
+}
+
+/* ---------- 设置 ---------- */
+function fillSettings(){
+  $('sysPrompt').value=CFG.systemPromptTemplate||'';
+  $('sysMode').value=CFG.systemPromptMode||'append';
+  $('defPool').value=CFG.defaultPool||'';
+  const tc=CFG.tokenCompression||{};
+  tcOn.checked=!!tc.enabled;tcMax.value=tc.maxContextTokens||8000;tcStrategy.value=tc.strategy||'truncate';
+  const ap=CFG.autoProbe||{};apOn.checked=ap.enabled!==false;apMin.value=ap.intervalMinutes||15;
+  srOn.checked=!!(CFG.smartRouting||{}).enabled;
+}
+async function saveSettings(){
+  CFG.systemPromptTemplate=$('sysPrompt').value;
+  CFG.systemPromptMode=sysMode.value;
+  CFG.defaultPool=defPool.value||null;
+  CFG.tokenCompression={enabled:tcOn.checked,maxContextTokens:+tcMax.value||8000,strategy:tcStrategy.value};
+  CFG.autoProbe={enabled:apOn.checked,intervalMinutes:+apMin.value||15,
+                 timeoutSeconds:(CFG.autoProbe||{}).timeoutSeconds||20,
+                 probeModelsPerRound:(CFG.autoProbe||{}).probeModelsPerRound||2};
+  const sr=CFG.smartRouting||{classifier:{},rules:{},routes:{}};
+  sr.enabled=srOn.checked;CFG.smartRouting=sr;
+  await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(CFG)});
+  toast('设置已保存');
+}
+async function resetSettings(){
+  if(!confirm('确定恢复默认设置吗？\n（你添加的模型都会保留，只重置开关和选项）'))return;
+  await api('/api/settings/reset',{method:'POST'});
+  toast('已恢复默认设置');loadCfg();
+}
+
+loadCfg().then(()=>{loadStatus();loadCatalog();loadConvs();renderMsgs();});
+setInterval(()=>{if($('tab-status').classList.contains('active'))loadStatus();},10000);
+</script>
+</body>
+</html>

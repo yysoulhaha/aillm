@@ -1,0 +1,4 @@
+#!/bin/sh
+# AI-LLM 启动器（.deb 安装后 /usr/bin/ai-llm）
+# 数据自动落 $XDG_DATA_HOME/ai-llm（~/.local/share/ai-llm）
+exec /opt/AI-LLM/.venv/bin/python /opt/AI-LLM/server.py "$@"
