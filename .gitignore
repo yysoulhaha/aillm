@@ -9,6 +9,7 @@ build-linux/
 build-venv/
 dist/
 dist-linux/
+dist_release/
 packaging/.deb_stage/
 # Python/Node 依赖与缓存
 .venv/
