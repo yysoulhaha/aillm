@@ -1,6 +1,6 @@
 # aillm — AI Model Unified Management Gateway
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10+-informational.svg)](https://www.python.org/)
 
 **aillm** is a local-first AI model gateway that runs entirely on your own machine. It consolidates
@@ -118,4 +118,4 @@ corresponding obligations yourself.
 
 ## License
 
-[MIT](LICENSE) © yousoulhaha and aillm contributors
+[Apache-2.0](LICENSE) © yysoulhaha and aillm contributors

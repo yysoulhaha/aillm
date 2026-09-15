@@ -1,6 +1,6 @@
 # aillm · AI 模型统一管理网关
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.10+-informational.svg)](https://www.python.org/)
 
 **aillm** 是一款在你自己电脑上本地运行的 AI 模型网关：把多个模型服务（多厂商、多把密钥）
@@ -110,4 +110,4 @@ aillm 仅提供本地单机软件。请确保你接入的模型服务符合服�
 
 ## License
 
-[MIT](LICENSE) © yousoulhaha and aillm contributors
+[Apache-2.0](LICENSE) © yysoulhaha and aillm contributors
