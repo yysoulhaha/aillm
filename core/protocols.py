@@ -79,9 +79,11 @@ def _anthropic_in_to_openai(body):
         "max_tokens": body.get("max_tokens", _DEFAULT_MAX_TOKENS),
         "stream": body.get("stream", False),
     }
-    for k in ("temperature", "top_p", "stop", "tools", "tool_choice"):
+    for k in ("temperature", "top_p", "tools", "tool_choice"):
         if k in body:
             out[k] = body[k]
+    if "stop_sequences" in body:
+        out["stop"] = body["stop_sequences"]
     return out
 
 
@@ -126,6 +128,8 @@ def _gemini_in_to_openai(body):
         "top_p": gc.get("topP"),
         "stream": body.get("stream", False),
     }
+    if gc.get("stopSequences"):
+        out["stop"] = gc["stopSequences"]
     out = {k: v for k, v in out.items() if v is not None}
     return out
 
@@ -158,9 +162,12 @@ def _openai_to_anthropic(body):
     }
     if system_text:
         out["system"] = system_text
-    for k in ("temperature", "top_p", "stop", "tools", "tool_choice"):
+    for k in ("temperature", "top_p", "tools", "tool_choice"):
         if k in body and body[k] is not None:
             out[k] = body[k]
+    if body.get("stop") is not None:
+        # Anthropic 用 stop_sequences，OpenAI 叫 stop
+        out["stop_sequences"] = body["stop"]
     return out
 
 
