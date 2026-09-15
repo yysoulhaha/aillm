@@ -12,6 +12,27 @@ exposes one OpenAI-compatible `/v1` endpoint that any AI client can plug into.
 > no membership/subscription system, and no phone-home authorization. You supply the access (API keys);
 > all data (keys, config, usage) stays in `data/config.json` on your machine.
 
+![aillm dashboard](docs/aillm-home.png)
+
+## Comparison with one-api / new-api
+
+Different tools for different jobs — pick by your primary need:
+
+| | aillm | one-api | new-api |
+|---|---|---|---|
+| Purpose | local-first, single machine / single user | multi-user distribution & token quotas | multi-user distribution, more channels & features |
+| Smart routing (pick model by task) | ✅ rule pre-filter + EWMA scoring | ⚠️ weight / priority based | ⚠️ similar |
+| Auto failover (breaker + fallback chain) | ✅ native | ⚠️ simple retry | ⚠️ simple retry |
+| Multi-key rotation / rate-limit spreading | ✅ round-robin + health stats | ✅ quota system | ✅ quota system |
+| Multi-user / token quotas | ❌ single user (by design) | ✅ full | ✅ full + more |
+| Multi-protocol translation | ✅ OpenAI/Anthropic/Gemini native | ⚠️ adapter-based, limited | ✅ broad channel coverage |
+| Official endpoint templates | ✅ 16 vendors, click-to-fill | ❌ manual entry | ❌ manual entry |
+| Database | ❌ single JSON file | SQLite / MySQL | SQLite / MySQL (+Redis optional) |
+| Windows install | ✅ one-click exe / zip | ❌ needs a runtime stack | ❌ needs a runtime stack |
+
+aillm focuses on the personal/local-first use case: no database, no user system, no built-in channels —
+bring your own keys, get smart routing, automatic failover, protocol translation and a one-click desktop.
+
 ## Features
 
 - **Unified model management** — manage vendors & keys in one place; enable/disable, group into
@@ -35,9 +56,27 @@ exposes one OpenAI-compatible `/v1` endpoint that any AI client can plug into.
 pip install -r requirements.txt
 python server.py                     # open http://127.0.0.1:18123/
 
-# Option B: Tauri desktop client (optional)
+# Option B: Docker
+docker build -t aillm .              # build once
+docker run -d -p 18123:18123 \
+  -v aillm-data:/data \
+  --name aillm aillm                 # data is kept in the aillm-data volume
+
+# Option C: Tauri desktop client (optional)
 cd gateway-client && npm install && npm run tauri dev
 ```
+
+Smoke-test the gateway (any OpenAI-compatible client works):
+
+```bash
+curl http://127.0.0.1:18123/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer local" \
+  -d '{"model":"auto","messages":[{"role":"user","content":"hello"}]}'
+```
+
+> The Docker image listens on `0.0.0.0` by default (`AILLM_HOST` env var) and stores all config/keys
+> under the mounted `/data` volume. No database required.
 
 Open the panel and:
 

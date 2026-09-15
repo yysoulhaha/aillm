@@ -11,6 +11,27 @@
 > 不做联网授权校验。所有模型服务由你自行提供访问权限（API Key）；密钥、配置、用量只存在
 > 本机 `data/config.json`。
 
+![aillm 管理面板](docs/aillm-home.png)
+
+## 与 one-api / new-api 的对比
+
+各有所长，按你的主要场景选：
+
+| | aillm | one-api | new-api |
+|---|---|---|---|
+| 定位 | 本地优先、单机/单用户 | 多用户分发、令牌额度 | 多用户分发、更多渠道与功能 |
+| 智能路由（按任务选模型） | ✅ 规则速判 + EWMA 四维评分 | ⚠️ 权重/优先级调度 | ⚠️ 同类 |
+| 自动容灾（熔断+Fallback 链） | ✅ 原生 | ⚠️ 简单错误重试 | ⚠️ 简单重试 |
+| 多 Key 轮询 / 限流分散 | ✅ 轮询 + 健康统计 | ✅ 配额体系 | ✅ 配额体系 |
+| 多用户 / 令牌额度 | ❌ 单机单用户（本意如此） | ✅ 完整 | ✅ 完整+更多 |
+| 多协议互转 | ✅ OpenAI/Anthropic/Gemini 原生 | ⚠️ 适配器实现、覆盖有限 | ✅ 渠道覆盖较全 |
+| 官方接口模板 | ✅ 内置 16 家，一键填入 | ❌ 需手动填 | ❌ 需手动填 |
+| 数据库 | ❌ 一个 JSON 文件 | SQLite / MySQL | SQLite / MySQL（可选 Redis） |
+| Windows 安装包 | ✅ 一键 exe / zip | ❌ 需自建运行环境 | ❌ 需自建运行环境 |
+
+aillm 专注「个人 / 本地优先」场景：无需数据库、没有账户体系、不内置任何渠道——自带 Key，
+给你智能路由、自动容灾、三协议互转和一键桌面版。
+
 ## 特性
 
 - **多模型统一管理**：多厂商 / 多把 Key 一处维护，启停、分组（免费池 / 付费池）、健康状态一目了然
@@ -30,9 +51,27 @@
 pip install -r requirements.txt
 python server.py          # 启动后打开 http://127.0.0.1:18123/
 
-# 方式 B：Tauri 桌面客户端（可选）
+# 方式 B：Docker
+docker build -t aillm .   # 先构建一次
+docker run -d -p 18123:18123 \
+  -v aillm-data:/data \
+  --name aillm aillm      # 配置/密钥保存在 aillm-data 卷里
+
+# 方式 C：Tauri 桌面客户端（可选）
 cd gateway-client && npm install && npm run tauri dev
 ```
+
+用 curl 快速验证网关可用（任意 OpenAI 兼容客户端同理）：
+
+```bash
+curl http://127.0.0.1:18123/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer local" \
+  -d '{"model":"auto","messages":[{"role":"user","content":"你好"}]}'
+```
+
+> Docker 镜像默认监听 `0.0.0.0`（环境变量 `AILLM_HOST` 可改），配置/密钥落在挂载的
+> `/data` 卷，无需数据库。
 
 打开面板后：
 

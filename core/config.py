@@ -248,12 +248,19 @@ def save_config(cfg=None):
 
 
 def get_port():
+    env = os.environ.get("AILLM_PORT")
+    if env and env.strip().isdigit():
+        return int(env.strip())
     return int(load_config().get("port", 18123))
 
 
 def get_bind_host():
     """监听地址。默认 127.0.0.1（普通用户免防火墙弹窗、防局域网裸奔）；
-    需要局域网/公网访问时在 config.json 设 "bindHost": "0.0.0.0"。"""
+    需要局域网/公网访问时在 config.json 设 "bindHost": "0.0.0.0"
+    或用环境变量 AILLM_HOST（Docker 部署默认 0.0.0.0）。"""
+    env = os.environ.get("AILLM_HOST")
+    if env is not None and env.strip():
+        return env.strip()
     return str(load_config().get("bindHost", "127.0.0.1"))
 
 

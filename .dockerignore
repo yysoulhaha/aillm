@@ -1,0 +1,16 @@
+.git
+.venv
+venv
+__pycache__
+*.py[cod]
+data
+dist
+dist_release
+build
+tests
+docs
+packaging
+gateway-client
+使用说明.md
+启动客户端.bat
+启动客户端.vbs
