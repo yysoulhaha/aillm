@@ -206,11 +206,11 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
 <section class="page" id="tab-add">
   <div class="card">
     <h2>添加模型源</h2>
-    <p class="hint" style="margin:4px 0 16px">三步接入：填地址 → 填密钥 → 点获取模型。勾选需要的模型后保存。</p>
+    <p class="hint" style="margin:4px 0 16px">三步接入：填地址 → 填密钥（本机/自建模型可免密钥） → 点获取模型。勾选需要的模型后保存。</p>
     <details class="adv" style="margin-bottom:14px">
-      <summary>📚 官方接口模板（一键填入地址，密钥需你自己填）</summary>
-      <div id="tplWrap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:10px"></div>
-      <p class="hint" style="margin-top:8px">模板仅提供各厂商公开的官方接口地址，不含任何密钥；填好后请在下方粘贴你自己购买的 API Key。</p>
+      <summary>📚 接口模板（官方付费 / 官方免费额度 / 本机免密钥，一键填入地址）</summary>
+      <div id="tplWrap" style="margin-top:10px"></div>
+      <p class="hint" style="margin-top:8px">模板仅提供各厂商公开的官方接口地址，不含任何密钥。付费 Key 请自行购买；「官方免费额度」的 Key 请到官方网页注册领取；「本机 / 自建」服务无需密钥。</p>
     </details>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div><label class="f">标识名 *</label><input id="a_id" placeholder="my-provider"></div>
@@ -220,7 +220,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     <input id="a_base" placeholder="https://xxx.com/v1">
     <label class="f">接口格式</label>
     <select id="a_proto"><option value="openai">OpenAI 标准</option><option value="anthropic">Claude 格式</option><option value="gemini">Gemini 格式</option></select>
-    <label class="f">密钥 Keys（每行一个；免密钥填 __KEYLESS__）</label>
+    <label class="f">密钥 Keys（每行一个；本机/自建服务免密钥填 __KEYLESS__）</label>
     <textarea id="a_keys" rows="3" class="mono"></textarea>
     <div class="flex" style="margin-top:16px">
       <button class="btn-g" onclick="fetchModels()">⬇ 获取模型</button>
@@ -460,17 +460,38 @@ const OFFICIAL_TEMPLATES=[
   {id:'groq',     name:'Groq',              base:'https://api.groq.com/openai/v1',             proto:'openai'},
   {id:'openrouter',name:'OpenRouter',       base:'https://openrouter.ai/api/v1',               proto:'openai'},
 ];
+const FREE_TIER_TEMPLATES=[
+  {id:'gemini-free',   name:'Google Gemini（官方免费档）', base:'https://generativelanguage.googleapis.com/v1beta', proto:'gemini', free:true},
+  {id:'zhipu-free',    name:'智谱 GLM（官方免费档）',       base:'https://open.bigmodel.cn/api/paas/v4',            proto:'openai', free:true},
+  {id:'dashscope-free',name:'通义千问（官方限免档）',      base:'https://dashscope.aliyuncs.com/compatible-mode/v1', proto:'openai', free:true},
+  {id:'groq-free',     name:'Groq（官方免费档）',           base:'https://api.groq.com/openai/v1',                  proto:'openai', free:true},
+  {id:'cerebras-free', name:'Cerebras（官方免费档）',      base:'https://api.cerebras.ai/v1',                      proto:'openai', free:true},
+];
+const LOCAL_TEMPLATES=[
+  {id:'ollama',   name:'Ollama（本机）',    base:'http://127.0.0.1:11434/v1', proto:'openai', keyless:'__KEYLESS__'},
+  {id:'lmstudio', name:'LM Studio（本机）', base:'http://127.0.0.1:1234/v1',  proto:'openai', keyless:'__KEYLESS__'},
+  {id:'local',    name:'自定义本机/自建',    base:'http://127.0.0.1:8000/v1',  proto:'openai', keyless:'__KEYLESS__'},
+];
 function renderTemplates(){
   const w=$('tplWrap');if(!w)return;
-  w.innerHTML=OFFICIAL_TEMPLATES.map(t=>
-    `<div style="border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:12px;transition:border-color .15s" onclick="fillTemplate('${t.id}')" title="点击填入 ${t.base}">
-       <b>${t.name}</b><div class="hint mono" style="font-size:10px;margin-top:2px">${t.base.replace('https://','').replace('/v1','').replace('/v1beta','')}</div>
-     </div>`).join('');
+  const card=t=>
+    `<div style="border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;font-size:12px;transition:border-color .18s" onclick="fillTemplate('${t.id}')" title="点击填入 ${t.base}">
+       <b>${t.name}</b><div class="hint mono" style="font-size:10px;margin-top:2px">${t.base.replace(/^https?:\/\//,'').replace(/\/v1$/,'').replace(/\/v1beta$/,'')}</div>
+     </div>`;
+  const group=(title,arr,hint)=>`<div style="margin:12px 0 4px"><b style="font-size:12px">${title}</b><span class="hint" style="font-size:11px;margin-left:6px">${hint||''}</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px">${arr.map(card).join('')}</div>`;
+  w.innerHTML=
+    group('官方接口模板',OFFICIAL_TEMPLATES,'· 付费通道，Key 需你自己购买')+
+    group('官方免费额度',FREE_TIER_TEMPLATES,'· 免费额度以官方最新规则为准，Key 请到官方网页注册后领取')+
+    group('本机 / 自建模型（免密钥）',LOCAL_TEMPLATES,'· 仅用于你自己本机/内网部署的 Ollama、LM Studio、vLLM 等，点击自动填入 __KEYLESS__');
 }
 function fillTemplate(id){
-  const t=OFFICIAL_TEMPLATES.find(x=>x.id===id);if(!t)return;
-  $('a_id').value=t.id;$('a_name').value=t.name+' 官方';$('a_base').value=t.base;$('a_proto').value=t.proto;
-  $('a_keys').focus();toast('已填入 '+t.name+' 官方接口，请粘贴你自己的 Key','ok');
+  const t=OFFICIAL_TEMPLATES.find(x=>x.id===id)||FREE_TIER_TEMPLATES.find(x=>x.id===id)||LOCAL_TEMPLATES.find(x=>x.id===id);
+  if(!t)return;
+  $('a_id').value=t.id;$('a_name').value=t.name;$('a_base').value=t.base;$('a_proto').value=t.proto;
+  if(t.keyless){$('a_keys').value=t.keyless;$('a_keys').focus();toast('已填入本机模型 '+t.name+'，已置为免密钥','ok');return;}
+  $('a_keys').value='';$('a_keys').focus();
+  toast('已填入 '+t.name+(t.free?'（官方免费额度，请到官方注册后领取 Key）':' 官方接口，请粘贴你自己的 Key'),'ok');
 }
 
 /* ---------- 版本信息 ---------- */

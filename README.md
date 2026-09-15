@@ -42,7 +42,8 @@ bring your own keys, get smart routing, automatic failover, protocol translation
 - **Auto failover** — circuit breaker + configurable fallback chain; conversations keep running when
   a provider degrades or goes down
 - **Official endpoint templates** — built-in list of official vendor endpoints; click to fill, then
-  paste your own key
+  paste your own key; plus a free-tier section (official quota, key resigned at the vendor site)
+  and no-key local self-hosted entries (Ollama / LM Studio / vLLM) that auto-fill `__KEYLESS__`
 - **Cross-protocol translation** — transparent conversion between OpenAI / Anthropic / Gemini message formats
 - **Token compression** — auto-truncate or summarize long contexts to save quota
 - **Usage analytics** — today / 7-day / 30-day token trends and per-supplier breakdown
