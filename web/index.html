@@ -27,6 +27,8 @@ nav::-webkit-scrollbar{display:none}
 .tab-btn:hover:not(.active){color:var(--txt);background:#f1f5f9}
 .set-btn{margin-left:auto;border:none;background:none;cursor:pointer;font-size:17px;padding:7px;border-radius:10px;color:var(--sub);transition:.15s}
 .set-btn:hover{background:#f1f5f9;color:var(--acc)}
+.doc-btn{border:none;background:none;cursor:pointer;font-size:13px;padding:7px 10px;border-radius:10px;color:var(--sub);text-decoration:none;transition:.15s}
+.doc-btn:hover{background:var(--acc-l);color:#c2410c;text-decoration:none}
 
 /* ─── layout ─── */
 main{max-width:1080px;margin:0 auto;padding:20px 20px 60px}
@@ -149,6 +151,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     <button class="tab-btn" data-tab="docs">📖 调用方法</button>
     <button class="tab-btn" data-tab="about">ℹ️ 关于</button>
   </nav>
+  <a class="doc-btn" href="https://gitee.com/my-soul-haha/aillm/blob/main/README.zh-CN.md" target="_blank" rel="noopener" title="中文使用说明">📘 中文说明</a>
   <button class="set-btn" onclick="openSettings()" title="高级设置">⚙️</button>
 </header>
 
@@ -375,6 +378,12 @@ resp = client.chat.completions.create(
     <div class="stepbox"><b>密钥隔离</b> — 支持多 Key 轮询，自动绕过单 Key 限流</div>
     <hr class="s">
     <p class="hint" style="text-align:center">本工具仅供个人学习研究使用<br>请遵守各平台的用户协议</p>
+    <hr class="s">
+    <p class="hint" style="text-align:center">开源地址：
+      <a href="https://github.com/yysoulhaha/aillm" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://gitee.com/my-soul-haha/aillm" target="_blank" rel="noopener">Gitee</a> ·
+      <a href="https://gitee.com/my-soul-haha/aillm/blob/main/README.zh-CN.md" target="_blank" rel="noopener">中文说明</a>
+    </p>
   </div>
 
 </section>

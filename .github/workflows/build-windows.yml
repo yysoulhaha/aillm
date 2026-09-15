@@ -1,0 +1,54 @@
+name: build-windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "GitHub release tag to attach the binaries to"
+        required: false
+        default: v2.1.1
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Build single-file exe
+        run: python -m PyInstaller packaging/AI-LLM-win-onefile.spec --noconfirm --distpath dist --workpath build --clean
+
+      - name: Build onedir and zip it
+        run: |
+          python -m PyInstaller packaging/AI-LLM.spec --noconfirm --distpath dist --workpath build --clean
+          Compress-Archive -Path dist/AI-LLM -DestinationPath dist/AI-LLM-Windows.zip
+
+      - name: Publish to release
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.inputs.release_tag || github.event.release.tag_name }}
+        run: |
+          $tag = $env:RELEASE_TAG
+          $ver = $tag.TrimStart('v')
+          Move-Item dist/AI-LLM-win64.exe "dist/aillm-$ver-win64.exe" -Force
+          Move-Item dist/AI-LLM-Windows.zip "dist/aillm-$ver-windows.zip" -Force
+          gh release upload "$tag" "dist/aillm-$ver-win64.exe" "dist/aillm-$ver-windows.zip" --clobber
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-binaries
+          path: |
+            dist/aillm-*-win64.exe
+            dist/aillm-*-windows.zip
