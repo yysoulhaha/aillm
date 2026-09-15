@@ -4,7 +4,7 @@
   "identifier": "com.ai-llm.gateway",
   "build": {
     "beforeDevCommand": "",
-    "devUrl": "http://127.0.0.1:18123/app",
+    "devUrl": "http://127.0.0.1:18111/app",
     "beforeBuildCommand": "",
     "frontendDist": "../frontend"
   },

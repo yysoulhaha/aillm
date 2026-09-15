@@ -12,6 +12,6 @@ ENV AI_LLM_HOME=/data \
 
 VOLUME ["/data"]
 
-EXPOSE 18123
+EXPOSE 18111
 
 CMD ["python", "server.py"]

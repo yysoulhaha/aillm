@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""AI 模型网关主服务（端口 18123）。
+"""AI 模型网关主服务（端口 18111）。
 
 集成优化：
   #1 熔断+多级Fallback  #2 配额感知  #3 按key模型过滤  #4 供应商级代理
@@ -1451,7 +1451,7 @@ def main():
     try:
         port = config.get_port()
     except Exception:
-        port = 18123
+        port = 18111
     try:
         host = config.get_bind_host()
     except Exception:

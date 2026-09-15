@@ -2,7 +2,7 @@
 """AI-Gateway-C 桌面客户端（Python 原生窗口版）。
 
 依赖：pip install pywebview
-运行：py -3 client.py  （自动连接本机 http://127.0.0.1:18123/app）
+运行：py -3 client.py  （自动连接本机 http://127.0.0.1:18111/app）
 若网关未启动，会尝试在本进程拉起 server.py。
 """
 import subprocess
@@ -13,7 +13,7 @@ import urllib.request
 import pathlib
 
 HERE = pathlib.Path(__file__).resolve().parent
-PORT = 18123
+PORT = 18111
 URL = f"http://127.0.0.1:{PORT}/app"
 
 

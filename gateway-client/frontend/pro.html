@@ -223,9 +223,9 @@ pre#logbox{background:#0a0d12;border:1px solid var(--line);border-radius:8px;pad
 <section class="page" id="tab-help">
   <div class="help card">
     <h3>🚀 快速开始</h3>
-    <p>桌面客户端双击 <span class="mono">ai-gateway-c-client.exe</span> 自动启动网关(:18123)；或命令行 <span class="mono">py -3 server.py</span> 后访问 <span class="mono">http://127.0.0.1:18123/pro</span>。普通版入口 <span class="mono">/simple</span>。</p>
+    <p>桌面客户端双击 <span class="mono">ai-gateway-c-client.exe</span> 自动启动网关(:18111)；或命令行 <span class="mono">py -3 server.py</span> 后访问 <span class="mono">http://127.0.0.1:18111/pro</span>。普通版入口 <span class="mono">/simple</span>。</p>
     <h3>🔌 客户端接入</h3>
-    <p>API Base : <span class="mono">http://127.0.0.1:18123/v1</span>　API Key : 任意值<br>
+    <p>API Base : <span class="mono">http://127.0.0.1:18111/v1</span>　API Key : 任意值<br>
     模型名 : auto（全库自动挑）/ auto:free / 具体模型ID；可加 pool 参数限定免费或付费池</p>
     <h3>➕ 添加上游流程</h3>
     <p>① 新增供应商 → 填 ID/BaseURL(/v1 结尾)/协议/配额　② 填 Keys（免Key填 __KEYLESS__）<br>
@@ -236,7 +236,7 @@ pre#logbox{background:#0a0d12;border:1px solid var(--line);border-radius:8px;pad
     <h3>📚 模型参数资料</h3>
     <p>从 DataLearner 抓参数量/上下文/发布时间用于展示与评分兜底；「免费/付费」标记后缀自动剥离后查询；负缓存可在「补全」时清除重试。</p>
     <h3>❓ 常见问题</h3>
-    <p><b>端口占用：</b><span class="mono">Get-NetTCPConnection -LocalPort 18123</span> → Stop-Process。<br>
+    <p><b>端口占用：</b><span class="mono">Get-NetTCPConnection -LocalPort 18111</span> → Stop-Process。<br>
     <b>502：</b>看监控日志最后错误，多为上游 Key 失效；熔断+Fallback 自动换家。<br>
     <b>数据位置：</b>配置 <span class="mono">data\config.json</span>；日志 <span class="mono">logs\gateway.log</span>；参数缓存 <span class="mono">data\model_params.json</span></p>
   </div>
@@ -275,7 +275,7 @@ pre#logbox{background:#0a0d12;border:1px solid var(--line);border-radius:8px;pad
 <div class="toast" id="toast"></div>
 
 <script>
-const SUP=(location.hostname==='127.0.0.1'&&location.port==='18123')?'':'http://127.0.0.1:18123';
+const SUP=(location.hostname==='127.0.0.1'&&location.port==='18111')?'':'http://127.0.0.1:18111';
 let CFG=null,editingId=null,fetchedModels=null;
 const $=id=>document.getElementById(id);
 async function api(p,o){const r=await fetch(SUP+p,o);return r.json();}

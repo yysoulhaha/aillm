@@ -144,11 +144,11 @@ details.adv[open] summary{color:var(--acc)}
     <summary style="color:var(--acc);font-weight:bold">📖 怎么在其它软件里使用？（ChatBox / NextChat / 沉浸式翻译 等）</summary>
     <div style="margin-top:10px;font-size:13px;line-height:2">
       只需要填三项，任何支持「自定义 OpenAI 接口」的软件都能用：<br>
-      ① 接口地址(Base URL)：<b>http://127.0.0.1:18123/v1</b><br>
+      ① 接口地址(Base URL)：<b>http://127.0.0.1:18111/v1</b><br>
       ② API Key：随便填，比如 <b>local</b><br>
       ③ 模型名：填 <b>auto</b> 就行——系统会自动帮你挑最合适的模型；也可以在「模型广场」里挑具体名字<br><br>
       <span class="hint">命令行调用示例：<br>
-      curl http://127.0.0.1:18123/v1/chat/completions -H "Content-Type: application/json" -d "{\"model\":\"auto\",\"messages\":[{\"role\":\"user\",\"content\":\"你好\"}]}"</span>
+      curl http://127.0.0.1:18111/v1/chat/completions -H "Content-Type: application/json" -d "{\"model\":\"auto\",\"messages\":[{\"role\":\"user\",\"content\":\"你好\"}]}"</span>
     </div>
   </details>
 
@@ -228,7 +228,7 @@ details.adv[open] summary{color:var(--acc)}
 <div class="toast" id="toast"></div>
 
 <script>
-const SUP=(location.hostname==='127.0.0.1'&&location.port==='18123')?'':'http://127.0.0.1:18123';
+const SUP=(location.hostname==='127.0.0.1'&&location.port==='18111')?'':'http://127.0.0.1:18111';
 let CFG=null,CATALOG=null,editingId=null,fetchedModels=null;
 const $=id=>document.getElementById(id);
 async function api(p,o){const r=await fetch(SUP+p,o);return r.json();}

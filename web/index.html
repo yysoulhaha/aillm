@@ -271,7 +271,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     <h2>📖 通用配置</h2>
     <p class="hint" style="margin:8px 0 14px">所有客户端均使用以下连接信息：</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-      <div class="stepbox"><b>接口地址</b><br><code id="cp_base">http://127.0.0.1:18123/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋 复制</button></div>
+      <div class="stepbox"><b>接口地址</b><br><code id="cp_base">http://127.0.0.1:18111/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋 复制</button></div>
       <div class="stepbox"><b>API Key</b><br><code id="cp_key">local</code><button class="copybtn" onclick="cpy('cp_key')">📋 复制</button></div>
     </div>
     <div class="stepbox"><b>模型</b>：<code>auto</code>（自动挑选最佳模型）或指定模型 ID</div>
@@ -283,7 +283,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     </div>
     <div class="stepbox">设置 → 模型提供商 → 自定义 OpenAI 兼容</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-      <div style="background:#fef3c7;border-radius:8px;padding:10px 12px"><span class="hint" style="font-size:11px">API 地址</span><br><code style="font-size:12px">http://127.0.0.1:18123/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋</button></div>
+      <div style="background:#fef3c7;border-radius:8px;padding:10px 12px"><span class="hint" style="font-size:11px">API 地址</span><br><code style="font-size:12px">http://127.0.0.1:18111/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋</button></div>
       <div style="background:#fef3c7;border-radius:8px;padding:10px 12px"><span class="hint" style="font-size:11px">API Key</span><br><code style="font-size:12px">local</code><button class="copybtn" onclick="cpy('cp_key')">📋</button></div>
     </div>
     <div class="hint" style="margin-top:8px">支持流式/非流式，自动路由生效</div>
@@ -296,7 +296,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     </div>
     <div class="stepbox">设置 → AI 模型 → 自定义接口</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-      <div style="background:#cffafe;border-radius:8px;padding:10px 12px"><span class="hint" style="font-size:11px">接口地址</span><br><code style="font-size:12px">http://127.0.0.1:18123/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋</button></div>
+      <div style="background:#cffafe;border-radius:8px;padding:10px 12px"><span class="hint" style="font-size:11px">接口地址</span><br><code style="font-size:12px">http://127.0.0.1:18111/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋</button></div>
       <div style="background:#cffafe;border-radius:8px;padding:10px 12px"><span class="hint" style="font-size:11px">API Key</span><br><code style="font-size:12px">local</code><button class="copybtn" onclick="cpy('cp_key')">📋</button></div>
     </div>
     <div class="hint" style="margin-top:8px">填入通用接口地址和 Key 即可</div>
@@ -309,7 +309,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     </div>
     <div class="stepbox">插件 → LLM 节点 → 自定义接口</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-      <div style="background:#d1fae5;border-radius:8px;padding:10px 12px"><span class="hint" style="font-size:11px">Base URL</span><br><code style="font-size:12px">http://127.0.0.1:18123/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋</button></div>
+      <div style="background:#d1fae5;border-radius:8px;padding:10px 12px"><span class="hint" style="font-size:11px">Base URL</span><br><code style="font-size:12px">http://127.0.0.1:18111/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋</button></div>
       <div style="background:#d1fae5;border-radius:8px;padding:10px 12px"><span class="hint" style="font-size:11px">Key</span><br><code style="font-size:12px">local</code><button class="copybtn" onclick="cpy('cp_key')">📋</button></div>
     </div>
     <div class="hint" style="margin-top:8px">支持插件调用和工作流</div>
@@ -322,7 +322,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     </div>
     <div style="background:#fef3c7;border-radius:8px;padding:10px 12px;margin-top:12px">
       <span class="hint" style="font-size:11px">API URL</span><br>
-      <code id="cp_url2" style="font-size:12px">http://127.0.0.1:18123/v1/chat/completions</code>
+      <code id="cp_url2" style="font-size:12px">http://127.0.0.1:18111/v1/chat/completions</code>
       <button class="copybtn" onclick="cpy('cp_url2')">📋</button>
     </div>
     <div class="hint" style="margin-top:8px">Key: local</div>
@@ -333,7 +333,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
       <span style="font-size:24px">💻</span>
       <div><b>curl / 命令行</b><div class="hint" style="font-size:11px">开发者调试</div></div>
     </div>
-    <pre class="logs" style="font-size:10px;margin-top:12px">curl http://127.0.0.1:18123/v1/chat/completions \
+    <pre class="logs" style="font-size:10px;margin-top:12px">curl http://127.0.0.1:18111/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer local" \
   -d '{"model":"auto","messages":[{"role":"user","content":"你好"}]}'</pre>
@@ -346,7 +346,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     </div>
     <pre class="logs" style="font-size:10px;margin-top:12px">from openai import OpenAI
 client = OpenAI(
-  base_url="http://127.0.0.1:18123/v1",
+  base_url="http://127.0.0.1:18111/v1",
   api_key="local")
 resp = client.chat.completions.create(
   model="auto",

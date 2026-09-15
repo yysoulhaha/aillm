@@ -10,7 +10,7 @@ use tauri::{
 };
 
 static BACKEND_STARTED: AtomicBool = AtomicBool::new(false);
-static BACKEND_PORT: Mutex<u16> = Mutex::new(18123);
+static BACKEND_PORT: Mutex<u16> = Mutex::new(18111);
 static TRAY_ICON: OnceLock<TrayIcon> = OnceLock::new();
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "port": 18123,
+  "port": 18111,
   "systemPromptTemplate": "",
   "systemPromptMode": "append",
   "tokenCompression": {

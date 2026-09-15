@@ -55,11 +55,11 @@ bring your own keys, get smart routing, automatic failover, protocol translation
 ```bash
 # Option A: run directly
 pip install -r requirements.txt
-python server.py                     # open http://127.0.0.1:18123/
+python server.py                     # open http://127.0.0.1:18111/
 
 # Option B: Docker
 docker build -t aillm .              # build once
-docker run -d -p 18123:18123 \
+docker run -d -p 18111:18111 \
   -v aillm-data:/data \
   --name aillm aillm                 # data is kept in the aillm-data volume
 
@@ -70,7 +70,7 @@ cd gateway-client && npm install && npm run tauri dev
 Smoke-test the gateway (any OpenAI-compatible client works):
 
 ```bash
-curl http://127.0.0.1:18123/v1/chat/completions \
+curl http://127.0.0.1:18111/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer local" \
   -d '{"model":"auto","messages":[{"role":"user","content":"hello"}]}'
@@ -84,7 +84,7 @@ Open the panel and:
 1. Go to the **Add Model Source** tab → expand *Official Endpoint Templates* → pick a vendor
    (the address is filled in automatically)
 2. Paste **your own** API key → click *Fetch Models* → tick the models you need → *Save*
-3. Chat in the browser, or point any OpenAI-compatible client at `http://127.0.0.1:18123/v1`
+3. Chat in the browser, or point any OpenAI-compatible client at `http://127.0.0.1:18111/v1`
    with key `local` (use model `auto` for automatic selection, or a specific model ID)
 
 > aillm does not provide or bundle any keyless model channel — the model service must come from your key.

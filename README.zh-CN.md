@@ -49,11 +49,11 @@ aillm 专注「个人 / 本地优先」场景：无需数据库、没有账户�
 ```bash
 # 方式 A：直接跑
 pip install -r requirements.txt
-python server.py          # 启动后打开 http://127.0.0.1:18123/
+python server.py          # 启动后打开 http://127.0.0.1:18111/
 
 # 方式 B：Docker
 docker build -t aillm .   # 先构建一次
-docker run -d -p 18123:18123 \
+docker run -d -p 18111:18111 \
   -v aillm-data:/data \
   --name aillm aillm      # 配置/密钥保存在 aillm-data 卷里
 
@@ -64,7 +64,7 @@ cd gateway-client && npm install && npm run tauri dev
 用 curl 快速验证网关可用（任意 OpenAI 兼容客户端同理）：
 
 ```bash
-curl http://127.0.0.1:18123/v1/chat/completions \
+curl http://127.0.0.1:18111/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer local" \
   -d '{"model":"auto","messages":[{"role":"user","content":"你好"}]}'
@@ -77,7 +77,7 @@ curl http://127.0.0.1:18123/v1/chat/completions \
 
 1. 进入「➕ 添加模型源」，点开《官方接口模板》选择厂商 → 地址自动填入
 2. 粘贴**你自己**的 API Key → 「⬇ 获取模型」→ 勾选所需模型 →「✅ 保存选中」
-3. 直接网页对话；或把任意 OpenAI 兼容客户端指向 `http://127.0.0.1:18123/v1`，Key 填 `local`
+3. 直接网页对话；或把任意 OpenAI 兼容客户端指向 `http://127.0.0.1:18111/v1`，Key 填 `local`
    （模型名填 `auto` 自动挑选，或填具体模型 ID）
 
 > aillm 不提供、也不包含任何免密钥渠道——模型服务来自你的 Key。

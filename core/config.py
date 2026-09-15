@@ -4,7 +4,7 @@
 config.json 结构（feat 映射见各字段注释）：
 {
   "schemaVersion": 1,
-  "port": 18123,                         # 本网关端口（独立于 B 的 8670）
+  "port": 18111,                         # 本网关端口（独立于 B 的 8670）
   "systemPromptTemplate": "",            # feat#7 全局系统提示词（可 append/override）
   "systemPromptMode": "append",          # append | override
   "tokenCompression": {...},             # feat#9
@@ -251,7 +251,7 @@ def get_port():
     env = os.environ.get("AILLM_PORT")
     if env and env.strip().isdigit():
         return int(env.strip())
-    return int(load_config().get("port", 18123))
+    return int(load_config().get("port", 18111))
 
 
 def get_bind_host():
@@ -301,7 +301,7 @@ def get_admin_token(cfg=None) -> str:
 def _default_config():
     return {
         "schemaVersion": SCHEMA_VERSION,
-        "port": 18123,
+        "port": 18111,
         "bindHost": "127.0.0.1",      # 默认只监听本机：普通用户免防火墙弹窗，最稳；改 0.0.0.0 开放局域网
         "systemPromptTemplate": "",
         "systemPromptMode": "append",

@@ -7,5 +7,5 @@ Depends: python3 (>= 3.10), python3-venv, python3-pip
 Maintainer: AI-Local <ai-local@local>
 Description: AI-LLM 智能网关 — 免费/会员模型聚合网关
  零模型安装包，首次启动自动从云端下载免费模型。
- 启动后管理面板: http://127.0.0.1:18123/
+ 启动后管理面板: http://127.0.0.1:18111/
  常用命令: ai-llm --open （打开面板）

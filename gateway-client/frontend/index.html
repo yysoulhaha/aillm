@@ -251,7 +251,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     <details open><summary style="cursor:pointer;font-weight:600;font-size:14px;color:var(--acc)">🤖 WorkBuddy / OpenClaw</summary>
       <div style="padding:12px 0">
         <p class="hint" style="margin-bottom:8px">打开设置 → AI 模型 → 自定义接口：</p>
-        <div class="stepbox">接口地址：<code id="cp_base">http://127.0.0.1:18123/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋 复制</button></div>
+        <div class="stepbox">接口地址：<code id="cp_base">http://127.0.0.1:18111/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋 复制</button></div>
         <div class="stepbox">API Key：<code id="cp_key">local</code><button class="copybtn" onclick="cpy('cp_key')">📋 复制</button></div>
         <div class="stepbox">模型：<code>auto</code>（自动挑最合适的）</div>
       </div>
@@ -260,7 +260,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     <details><summary style="cursor:pointer;font-weight:600;font-size:14px;color:var(--acc)">🟣 扣子 Coze</summary>
       <div style="padding:12px 0">
         <p class="hint" style="margin-bottom:8px">在「插件 → LLM」节点中选自定义接口：</p>
-        <div class="stepbox">Base URL：<code>http://127.0.0.1:18123/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋 复制</button></div>
+        <div class="stepbox">Base URL：<code>http://127.0.0.1:18111/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋 复制</button></div>
         <div class="stepbox">Key：<code>local</code><button class="copybtn" onclick="cpy('cp_key')">📋 复制</button></div>
       </div>
     </details>
@@ -268,7 +268,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     <details><summary style="cursor:pointer;font-weight:600;font-size:14px;color:var(--acc)">💬 ChatBox / NextChat / LobeChat</summary>
       <div style="padding:12px 0">
         <p class="hint" style="margin-bottom:8px">设置 → 模型提供商 → 自定义 OpenAI 兼容：</p>
-        <div class="stepbox">API 地址：<code>http://127.0.0.1:18123/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋 复制</button></div>
+        <div class="stepbox">API 地址：<code>http://127.0.0.1:18111/v1</code><button class="copybtn" onclick="cpy('cp_base')">📋 复制</button></div>
         <div class="stepbox">API Key：<code>local</code><button class="copybtn" onclick="cpy('cp_key')">📋 复制</button></div>
         <div class="stepbox">模型：<code>auto</code> 或具体模型 ID</div>
       </div>
@@ -276,14 +276,14 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
 
     <details><summary style="cursor:pointer;font-weight:600;font-size:14px;color:var(--acc)">🌐 沉浸式翻译等浏览器插件</summary>
       <div style="padding:12px 0">
-        <div class="stepbox">API URL：<code id="cp_url2">http://127.0.0.1:18123/v1/chat/completions</code><button class="copybtn" onclick="cpy('cp_url2')">📋 复制</button></div>
+        <div class="stepbox">API URL：<code id="cp_url2">http://127.0.0.1:18111/v1/chat/completions</code><button class="copybtn" onclick="cpy('cp_url2')">📋 复制</button></div>
         <div class="stepbox">Key：<code>local</code></div>
       </div>
     </details>
 
     <details><summary style="cursor:pointer;font-weight:600;font-size:14px;color:var(--acc)">💻 curl 命令行</summary>
       <div style="padding:12px 0">
-        <pre class="logs">curl http://127.0.0.1:18123/v1/chat/completions \
+        <pre class="logs">curl http://127.0.0.1:18111/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer local" \
   -d '{"model":"auto","messages":[{"role":"user","content":"你好"}]}'</pre>
@@ -293,7 +293,7 @@ label.f{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-wei
     <details><summary style="cursor:pointer;font-weight:600;font-size:14px;color:var(--acc)">🐍 Python OpenAI SDK</summary>
       <div style="padding:12px 0">
         <pre class="logs">from openai import OpenAI
-client = OpenAI(base_url="http://127.0.0.1:18123/v1", api_key="local")
+client = OpenAI(base_url="http://127.0.0.1:18111/v1", api_key="local")
 resp = client.chat.completions.create(
     model="auto",
     messages=[{"role": "user", "content": "你好"}])
